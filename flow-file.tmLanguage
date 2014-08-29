@@ -71,7 +71,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\"?\b(flags|defines)\b\"?(?:.*[:]\s*[\[])</string>
+			<string>\"?\b(flags|defines|codepaths)\b\"?(?:.*[:]\s*[\[])</string>
 			<key>name</key>
 			<string>meta.keyword_arrays.flow</string>
 		</dict>
@@ -121,7 +121,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\"?\b(name|version|author|package|icon)\b\"?\s*[:]\s*(['].*[']|["].*["])</string>
+			<string>\"?\b(name|version|author|package|icon|main|output)\b\"?\s*[:]\s*(['].*[']|["].*["])</string>
 			<key>name</key>
 			<string>meta.keyword_string.flow</string>
 		</dict>
