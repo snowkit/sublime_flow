@@ -12,18 +12,6 @@
 	<array>
 		<dict>
 			<key>include</key>
-			<string>#string_values</string>
-		</dict>
-		<dict>
-			<key>include</key>
-			<string>#numeric_values</string>
-		</dict>
-		<dict>
-			<key>include</key>
-			<string>#bool_values</string>
-		</dict>
-		<dict>
-			<key>include</key>
 			<string>#keyword_objects</string>
 		</dict>
 		<dict>
@@ -40,11 +28,19 @@
 		</dict>
 		<dict>
 			<key>include</key>
-			<string>#normal_objects</string>
+			<string>#numeric_values</string>
 		</dict>
 		<dict>
 			<key>include</key>
-			<string>#normal_string</string>
+			<string>#bool_values</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#string_values</string>
+		</dict>
+		<dict>
+			<key>include</key>
+			<string>#normal_objects</string>
 		</dict>
 		<dict>
 			<key>include</key>
@@ -60,7 +56,7 @@
 		<key>bool_values</key>
 		<dict>
 			<key>match</key>
-			<string>\b(true|false)\b</string>
+			<string>\"?\b(true|false)\b\"?</string>
 			<key>name</key>
 			<string>constant.numeric.flow</string>
 		</dict>
@@ -75,7 +71,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\b(flags|defines)\b(?:.*[:]\s*[\[])</string>
+			<string>\"?\b(flags|defines)\b\"?(?:.*[:]\s*[\[])</string>
 			<key>name</key>
 			<string>meta.keyword_arrays.flow</string>
 		</dict>
@@ -90,7 +86,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\b(dependencies|flags|defines|web|mobile|ios|android|libs|native)\b(?:.*[:]\s*[{])</string>
+			<string>\"?\b(dependencies|flags|defines|web|mobile|ios|android|libs|native)\b\"?(?:.*[:]\s*[{])</string>
 			<key>name</key>
 			<string>meta.keyword_objects.flow</string>
 		</dict>
@@ -105,7 +101,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\b(project|flow|app|build|files|if)\b(?:.*[:]\s*[{])</string>
+			<string>\"?\b(project|flow|app|build|files|if)\"?\b\"?(?:.*[:]\s*[{])</string>
 			<key>name</key>
 			<string>meta.keyword_roots.flow</string>
 		</dict>
@@ -125,7 +121,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\b(name|version|author|package|icon)\b\s*[:]\s*(['].*[']|["].*["])</string>
+			<string>\"?\b(name|version|author|package|icon)\b\"?\s*[:]\s*(['].*[']|["].*["])</string>
 			<key>name</key>
 			<string>meta.keyword_string.flow</string>
 		</dict>
@@ -145,7 +141,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\b(.*)\b\s*[:]\s*([0-9])</string>
+			<string>\"?\b(.*)\b\"?\s*[:]\s*([0-9])</string>
 			<key>name</key>
 			<string>meta.normal_numeric.flow</string>
 		</dict>
@@ -160,34 +156,14 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\b(.*)\b(?:.*[:]\s*[{])</string>
+			<string>\"?\b(.*)\b\"?(?:.*[:]\s*[{])</string>
 			<key>name</key>
 			<string>meta.normal_objects.flow</string>
-		</dict>
-		<key>normal_string</key>
-		<dict>
-			<key>captures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>entity.name.identifier.normal_string.flow</string>
-				</dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
-					<string>string.quoted.normal_string.flow</string>
-				</dict>
-			</dict>
-			<key>match</key>
-			<string>\b(.*)\b\s*[:]\s*(['].*[']|["].*["])</string>
-			<key>name</key>
-			<string>meta.normal_string.flow</string>
 		</dict>
 		<key>numeric_values</key>
 		<dict>
 			<key>match</key>
-			<string>([0-9])</string>
+			<string>\"?\b([0-9])\b\"?</string>
 			<key>name</key>
 			<string>constant.numeric.flow</string>
 		</dict>
