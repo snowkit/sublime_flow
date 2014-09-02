@@ -57,7 +57,9 @@ class FlowProject( sublime_plugin.EventListener ):
         print("[flow] refresh hxml on " + self.flow_file)
 
         self.hxml = run_process([
-            self.flow_path,
+            "haxelib",
+            "run",
+            "flow",
             "info",
             "--hxml",
             "--project", self.flow_file
