@@ -6,7 +6,7 @@ def haxe_parse_completion_list(_list):
     if _list is None:
         return []
 
-    # print(_list)
+    print(_list)
 
     try:
         root = ET.fromstring(str(_list))
@@ -49,6 +49,42 @@ def haxe_parse_completion_list(_list):
 
     return []
 
+#returns args, return_type from a <type> string
+def parse_args(_type):
+    _tmp = _type
+
+    _args = []
+    _result = 0
+    _count = 0
+    while _result != None:
+        _result = _tmp.find(' -> ')
+        _arg = _tmp[:_result]
+
+            #found a () which means it's a function type
+        _end = ')'
+        _par = _arg.find('(')
+        if(_par == -1):
+            _par = _arg.find('<')
+            _end = '> ->'
+
+        if _par != -1:
+            _endpar = _tmp.find(_end)
+            _arg = _tmp[:_endpar+1]
+            _tmp = _tmp[_endpar+1:]
+        else :
+            _tmp = _tmp[_result+4:]
+
+        if _arg:
+            _args.append(_arg)
+
+        _result = _tmp.find(' -> ')
+
+        _count += 1
+        if _count > 10 or _result == -1:
+            _result = None
+
+    return _args, _tmp
+
 #returns a single tuple parsed for legibility as function args, clamped if too long etc
 def parse_type(_type):
 
@@ -58,20 +94,18 @@ def parse_type(_type):
     if _type == "":
         return []
 
-    _list = _type.split(' -> ')
-
-        #removes the return type
-    _list.pop()
-
     result = []
 
-    for item in _list:
-        print(item)
+    _args, _return = parse_args(_type)
+
+    for item in _args:
         node = item.split(' : ')
-        print(node)
         _name = node[0]
-        _type = node[1]
-        result.append((_name+'\t'+_type, _name))
+        _typename = "Unknown"
+        if(len(node) > 1):
+            _typename = node[1]
+
+        result.append((_name+'\t'+_typename, _name))
 
     return result
 
