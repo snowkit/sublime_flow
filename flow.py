@@ -103,7 +103,7 @@ class FlowProject( sublime_plugin.EventListener ):
         offset = sel.begin()
         line, column = view.rowcol(offset)
         cwd = os.path.dirname(self.flow_file)
-        filename = fname #os.path.basename(fname)
+        filename = fname
         cwd += "/bin/mac64.build/"
 
         if ch == "." or ch == "(":
@@ -132,10 +132,7 @@ class FlowProject( sublime_plugin.EventListener ):
         if os.path.exists( fname ):
             shutil.copy2( fname , temp_file )
 
-        code = view.substr(sublime.Region(0, view.size()))
-        f = codecs.open( fname , "wb" , "utf-8" , "ignore" )
-        f.write( code )
-        f.close()
+        view.run_command("save")
 
     def restore_file_post_completion( self ):
 
@@ -145,7 +142,6 @@ class FlowProject( sublime_plugin.EventListener ):
         temp_file = os.path.join( folder , filename + ".tmp" )
 
         if os.path.exists( temp_file ) :
-            shutil.copy2( temp_file , fname )
             os.remove( temp_file )
         else:
             os.remove( fname )
