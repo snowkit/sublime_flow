@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, subprocess, codecs, shutil
+import sys, os, subprocess, codecs, shutil, json
 
 import sublime, sublime_plugin
 from .haxe_parse_completion_list import *
@@ -34,7 +34,7 @@ class FlowProject( sublime_plugin.EventListener ):
 
         self.flow_path = "flow"
         self.flow_file = ""
-        self.hxml = ""
+        self.info_json = None
         self.completion_data = None
 
     def __del__(self):
@@ -42,7 +42,7 @@ class FlowProject( sublime_plugin.EventListener ):
         FlowProject.flow = None
         self.flow_file = None
         self.flow_path = None
-        self.hxml = None
+        self.info_json = None
         del FlowProject.flow
         del self
 
@@ -50,20 +50,22 @@ class FlowProject( sublime_plugin.EventListener ):
         print("[flow] set flow file to " + file_name)
         sublime.status_message('set flow file to ' + file_name)
         self.flow_file = file_name
-        self.refresh_hxml()
+        self.refresh_info()
 
 
-    def refresh_hxml(self):
-        print("[flow] refresh hxml on " + self.flow_file)
+    def refresh_info(self):
+        print("[flow] refresh info/hxml on " + self.flow_file)
 
-        self.hxml = run_process([
+        self.info_json_src = run_process([
             "haxelib",
             "run",
             "flow",
             "info",
-            "--hxml",
             "--project", self.flow_file
         ]).decode("utf-8");
+
+        if self.info_json_src:
+            self.info_json = json.loads(self.info_json_src)
 
     def on_query_completions(self, view, prefix, locations):
 
@@ -77,7 +79,7 @@ class FlowProject( sublime_plugin.EventListener ):
             return []
 
         res = haxe_parse_completion_list(self.completion_data)
-        print(res)
+        # print(res)
 
         self.completion_data = None
 
@@ -89,9 +91,9 @@ class FlowProject( sublime_plugin.EventListener ):
             sublime.status_message("No flow file, right click in a flow file!")
             return
 
-        if self.hxml == "" or self.hxml == None:
-            sublime.status_message("no hxml for flow file, caching...")
-            self.refresh_hxml()
+        if not self.info_json:
+            sublime.status_message("no info/hxml for flow file, caching...")
+            self.refresh_info()
 
         sel = view.sel()[0]
         word = view.word(sel)
@@ -103,12 +105,12 @@ class FlowProject( sublime_plugin.EventListener ):
         offset = sel.begin()
         line, column = view.rowcol(offset)
         cwd = os.path.dirname(self.flow_file)
+        cwd = os.path.join( cwd, self.info_json['paths']['build'] )
         filename = fname
-        cwd += "/bin/mac64.build/"
 
         if ch == "." or ch == "(":
 
-            print("[flow] start completion")
+            print("[flow] start completion in " + cwd)
 
             self.save_file_for_completion(view, fname)
             self.completion_file = fname
@@ -120,7 +122,7 @@ class FlowProject( sublime_plugin.EventListener ):
                 "cwd":cwd,
                 "fname":filename,
                 "offset":offset,
-                "hxml":self.hxml.splitlines()
+                "hxml":self.info_json['hxml'].splitlines()
             })
 
     def save_file_for_completion( self, view, fname ):
@@ -169,6 +171,14 @@ class FlowProject( sublime_plugin.EventListener ):
         self.completion_file = None
         self.completion_view = None
 
+    def on_post_save_async(self, view):
+        pt = view.sel()[0].b
+        scope = str(view.scope_name(pt))
+
+        if "source.flow" in scope:
+            if fname == self.flow_file:
+                self.refresh_info()
+
         #when changing a flow file that is set as the active project,
         #we automatically refresh the hxml so that the completion is reliable
     def on_modified_async(self, view):
@@ -176,16 +186,12 @@ class FlowProject( sublime_plugin.EventListener ):
         scope = str(view.scope_name(pt))
         fname = view.file_name()
 
-        if "source.flow" in scope:
-            if fname == self.flow_file:
-                self.refresh_hxml()
-
-        elif "source.haxe" in scope:
+        if "source.haxe" in scope:
             fname = view.file_name()
             self.completion(view, fname)
 
 
 
-print("hello flow")
+print("[flow] hello flow")
 from .commands import *
 

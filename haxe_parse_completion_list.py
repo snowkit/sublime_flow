@@ -6,7 +6,7 @@ def haxe_parse_completion_list(_list):
     if _list is None:
         return []
 
-    print(_list)
+    # print(_list)
 
     try:
         root = ET.fromstring(str(_list))
