@@ -1,0 +1,39 @@
+[
+    {
+        "keys": ["ctrl+shift+0"],
+        "command": "flow_show_status",
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.haxe,source.flow"
+            }
+        ]
+    },
+    {
+        "keys": ["ctrl+shift+9"],
+        "command": "flow_set_project_file",
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.flow"
+            }
+        ]
+    },
+    {
+        "keys": ["ctrl+shift+8"],
+        "command": "flow_set_target_build",
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.flow,source.haxe"
+            }
+        ]
+    }
+
+]
