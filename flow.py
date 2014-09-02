@@ -44,6 +44,7 @@ class FlowProject( sublime_plugin.EventListener ):
         self.target = self.system
         self.build_debug = False
         self.build_verbose = False
+        self.build_only = False
 
     def __del__(self):
         print("[flow] __del__")
@@ -222,6 +223,7 @@ class FlowProject( sublime_plugin.EventListener ):
 
         _result.append(['Toggle debug build', "currently debug : " + str(self.build_debug).lower() ])
         _result.append(['Toggle verbose build', "currently verbose : " + str(self.build_verbose).lower() ])
+        _result.append(['Toggle build only', "currently build only : " + str(self.build_only).lower() ])
 
         return _result
 

@@ -27,12 +27,25 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
             else:
                 FlowProject.flow.build_debug = True
 
+            print("[flow] toggle build debug, now at " + str(FlowProject.flow.build_debug))
+
             #verbose flag
         if index == 3:
             if FlowProject.flow.build_verbose:
                 FlowProject.flow.build_verbose = False
             else:
                 FlowProject.flow.build_verbose = True
+
+            print("[flow] toggle build verbose, now at " + str(FlowProject.flow.build_verbose))
+
+            #build only flag
+        if index == 4:
+            if FlowProject.flow.build_only:
+                FlowProject.flow.build_only = False
+            else:
+                FlowProject.flow.build_only = True
+
+            print("[flow] toggle build only, now at " + str(FlowProject.flow.build_only))
 
     def is_visible(self):
         view = self.window.active_view()
