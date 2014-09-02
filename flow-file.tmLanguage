@@ -46,10 +46,6 @@
 			<key>include</key>
 			<string>#normal_numeric</string>
 		</dict>
-		<dict>
-			<key>include</key>
-			<string>#normal_bools</string>
-		</dict>
 	</array>
 	<key>repository</key>
 	<dict>
