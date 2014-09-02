@@ -68,12 +68,15 @@ class FlowProject( sublime_plugin.EventListener ):
         self.target = _target[0].lower()
         print("[flow] set build target to " + self.target)
 
+        self.refresh_info()
+
     def refresh_info(self):
         print("[flow] refresh info/hxml on " + self.flow_file)
 
         self.info_json_src = run_process([
             "haxelib", "run", "flow",
-            "info", "--project", self.flow_file
+            "info", self.target,
+            "--project", self.flow_file
         ]).decode("utf-8");
 
         if self.info_json_src:

@@ -16,6 +16,10 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
             if FlowProject.flow.flow_file:
                 self.window.open_file(FlowProject.flow.flow_file)
 
+            #target
+        if index == 1:
+            self.window.run_command('flow_set_target_build')
+
             #debug flag
         if index == 2:
             if FlowProject.flow.build_debug:
