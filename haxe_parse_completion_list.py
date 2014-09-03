@@ -14,7 +14,13 @@ def haxe_parse_completion_list(_list):
         #if there was a parse error, this is an error from haxe,
         #so we will show it for now as a completion with blank insert
         _error = _list.split('\n')
-        return [(_error[0], '')]
+        for _line in _error:
+            if _line.find("No completion point was found"):
+                return []
+
+        #remove the calling command
+        _error.pop()
+        _result = _error
 
         #list is completion of properties/methods on an object/Type
     if root.tag == 'list':
@@ -97,6 +103,10 @@ def parse_type(_type):
     result = []
 
     _args, _return = parse_args(_type)
+
+    if len(_args) == 1:
+        if _args[0] == 'Void':
+            return []
 
     for item in _args:
         node = item.split(' : ')
