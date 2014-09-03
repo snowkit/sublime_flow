@@ -6,7 +6,7 @@ def haxe_parse_completion_list(_list):
     if _list is None:
         return []
 
-    print(_list)
+    # print(_list)
 
     try:
         root = ET.fromstring(str(_list))
@@ -15,9 +15,6 @@ def haxe_parse_completion_list(_list):
         #so we will show it for now as a completion with blank insert
         _error = _list.split('\n')
 
-        #remove the calling command
-        _error.pop()
-
         _error_result = []
 
         for _line in _error:
@@ -25,7 +22,8 @@ def haxe_parse_completion_list(_list):
                 return []
             else:
                 if _line:
-                    _error_result.append(( _line, ' '))
+                    if _line.find('haxe --') == -1:
+                        _error_result.append(( _line, ' '))
 
         return _error_result
 

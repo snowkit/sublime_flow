@@ -1,50 +1,49 @@
 import sublime, sublime_plugin
 import sys, os, subprocess
 
-from ..flow import FlowProject, panel
+from ..flow import _flow_
 
 import Default
 stexec = getattr( Default , "exec" )
 ExecCommand = stexec.ExecCommand
 AsyncProcess = stexec.AsyncProcess
 
-
-print('flow / load run build')
-
 class FlowRunBuild( sublime_plugin.WindowCommand ):
     def run(self, file_regex=""):
+
         view = self.window.active_view()
 
-        if not FlowProject.flow.flow_file:
+        if not _flow_.flow_file:
             self.window.run_command('flow_show_status')
             print("[flow] build : no flow file")
             return
 
         _cmd = "run"
 
-        if FlowProject.flow.build_only:
+        if _flow_.build_only:
             _cmd = "build"
 
-        flow_cmd = [
+
+        flow_build_args = [
             "haxelib", "run", "flow",
-            _cmd, FlowProject.flow.target,
-            "--project", FlowProject.flow.flow_file
+            _cmd, _flow_.target,
+            "--project", _flow_.flow_file
         ]
 
 
-        if FlowProject.flow.build_debug:
-            flow_cmd.append('--debug')
+        if _flow_.build_debug:
+            flow_build_args.append('--debug')
 
-        if FlowProject.flow.build_verbose:
-            flow_cmd.append('--log')
-            flow_cmd.append('3')
+        if _flow_.build_verbose:
+            flow_build_args.append('--log')
+            flow_build_args.append('3')
 
-        print("[flow] build " + " ".join(flow_cmd))
+        print("[flow] build " + " ".join(flow_build_args))
 
         self.window.run_command("flow_do_build", {
-            "cmd": flow_cmd,
+            "cmd": flow_build_args,
             "file_regex" : file_regex,
-            "working_dir": FlowProject.flow.get_working_dir()
+            "working_dir": _flow_.get_working_dir()
         })
 
 class FlowDoBuild( ExecCommand ):
@@ -98,3 +97,8 @@ class FlowDoBuild( ExecCommand ):
         super(FlowDoBuild, self).finish(*args, **kwargs)
         output = self.output_view.substr(sublime.Region(0, self.output_view.size()))
         print(output)
+
+
+
+print("[flow] loaded run build")
+

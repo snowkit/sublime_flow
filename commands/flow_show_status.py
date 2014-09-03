@@ -1,20 +1,19 @@
 import sublime, sublime_plugin
 
-from ..flow import FlowProject, panel
-
-print('flow / load show status')
+from ..flow import _flow_, panel
 
 class FlowShowStatus( sublime_plugin.WindowCommand ):
+
     def run(self):
+
         view = self.window.active_view()
-        panel(self.window, FlowProject.flow.get_status(), self.on_select)
+        panel(self.window, _flow_.get_status(), self.on_select)
 
     def on_select(self, index):
-
             #the flow file
         if index == 0:
-            if FlowProject.flow.flow_file:
-                self.window.open_file(FlowProject.flow.flow_file)
+            if _flow_.flow_file:
+                self.window.open_file(_flow_.flow_file)
 
             #target
         if index == 1:
@@ -22,30 +21,30 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
 
             #debug flag
         if index == 2:
-            if FlowProject.flow.build_debug:
-                FlowProject.flow.build_debug = False
+            if _flow_.build_debug:
+                _flow_.build_debug = False
             else:
-                FlowProject.flow.build_debug = True
+                _flow_.build_debug = True
 
-            print("[flow] toggle build debug, now at " + str(FlowProject.flow.build_debug))
+            print("[flow] toggle build debug, now at " + str(_flow_.build_debug))
 
             #verbose flag
         if index == 3:
-            if FlowProject.flow.build_verbose:
-                FlowProject.flow.build_verbose = False
+            if _flow_.build_verbose:
+                _flow_.build_verbose = False
             else:
-                FlowProject.flow.build_verbose = True
+                _flow_.build_verbose = True
 
-            print("[flow] toggle build verbose, now at " + str(FlowProject.flow.build_verbose))
+            print("[flow] toggle build verbose, now at " + str(_flow_.build_verbose))
 
             #build only flag
         if index == 4:
-            if FlowProject.flow.build_only:
-                FlowProject.flow.build_only = False
+            if _flow_.build_only:
+                _flow_.build_only = False
             else:
-                FlowProject.flow.build_only = True
+                _flow_.build_only = True
 
-            print("[flow] toggle build only, now at " + str(FlowProject.flow.build_only))
+            print("[flow] toggle build only, now at " + str(_flow_.build_only))
 
     def is_visible(self):
         view = self.window.active_view()
@@ -56,3 +55,6 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
             return True
         else:
             return False
+
+
+print("[flow] loaded show status")

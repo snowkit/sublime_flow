@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, subprocess, shutil, json
+import sys, os, subprocess, shutil, json, codecs, tempfile
 
 import sublime, sublime_plugin
 from .haxe_parse_completion_list import *
@@ -10,29 +10,25 @@ plugin_file = __file__
 plugin_filepath = os.path.realpath(plugin_file)
 plugin_path = os.path.dirname(plugin_filepath)
 
-
-def run_process( args ):
-    startupinfo = None
-    #startupinfo = subprocess.STARTUPINFO()
-    #startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-    return subprocess.Popen(args, stdout=subprocess.PIPE, startupinfo=startupinfo).communicate()[0]
-
-def panel(_window, options, done, flags=0, sel_index=0, on_highlighted=None):
-    sublime.set_timeout(lambda: _window.show_quick_panel(options, done, flags, sel_index, on_highlighted), 10)
+try:
+  STARTUP_INFO = subprocess.STARTUPINFO()
+  STARTUP_INFO.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+  STARTUP_INFO.wShowWindow = subprocess.SW_HIDE
+except (AttributeError):
+    STARTUP_INFO = None
 
 
-class FlowCompletionCallbackCommand( sublime_plugin.WindowCommand  ):
 
-    def run( self, result=None, **kwargs ) :
-        FlowProject.flow.on_completion(result)
-
+_flow_ = None
 
 
 
 class FlowProject( sublime_plugin.EventListener ):
 
     def __init__(self):
-        FlowProject.flow = self
+        global _flow_
+        _flow_ = self
+        print(_flow_)
 
         self.flow_path = "flow"
         self.flow_file = ""
@@ -45,16 +41,6 @@ class FlowProject( sublime_plugin.EventListener ):
         self.build_debug = False
         self.build_verbose = False
         self.build_only = False
-
-    def __del__(self):
-        print("[flow] __del__")
-        FlowProject.flow = None
-        self.flow_file = None
-        self.flow_path = None
-        self.info_json = None
-        del FlowProject.flow
-        del self
-
 
     def set_flow_file( self, file_name ):
         print("[flow] set flow file to " + file_name)
@@ -85,6 +71,8 @@ class FlowProject( sublime_plugin.EventListener ):
 
     def on_query_completions(self, view, prefix, locations):
 
+        print(prefix)
+
         pt = view.sel()[0].b
         scope = str(view.scope_name(pt))
 
@@ -110,7 +98,7 @@ class FlowProject( sublime_plugin.EventListener ):
     def completion(self, view, fname):
 
         if self.flow_file == "" or self.flow_file is None:
-            sublime.status_message("No flow file, right click in a flow file!")
+            sublime.status_message("No flow file, right click in a flow file! {}".format(str(self.flow_file)))
             return
 
         if not self.info_json:
@@ -124,14 +112,16 @@ class FlowProject( sublime_plugin.EventListener ):
             return
 
         ch = view.substr(word)[0]
-        offset = sel.begin()
-        line, column = view.rowcol(offset)
+        code = view.substr(sublime.Region(0, view.size()))
+        prior = code[0:sel.begin()].encode('utf-8')
+        offset = len(prior)
+
         cwd = self.get_working_dir()
         filename = fname
 
         if ch == "." or ch == "(":
 
-            print("[flow] start completion in " + cwd)
+            print("[flow] start completion in {0}, ch is {1}".format(cwd,ch))
 
             self.save_file_for_completion(view, fname)
             self.completion_file = fname
@@ -152,10 +142,14 @@ class FlowProject( sublime_plugin.EventListener ):
         filename = os.path.basename( fname )
         temp_file = os.path.join( folder , filename + ".tmp" )
 
-        # if os.path.exists( fname ):
-        #     shutil.copy2( fname , temp_file )
+        if os.path.exists( fname ):
+            shutil.copy2( fname , temp_file )
 
-        view.run_command("save")
+        # view.run_command("save")
+        code = view.substr(sublime.Region(0, view.size()))
+        f = codecs.open( fname , "wb" , "utf-8" , "ignore" )
+        f.write( code )
+        f.close()
 
     def restore_file_post_completion( self ):
 
@@ -164,10 +158,11 @@ class FlowProject( sublime_plugin.EventListener ):
         filename = os.path.basename( fname )
         temp_file = os.path.join( folder , filename + ".tmp" )
 
-        # if os.path.exists( temp_file ) :
-        #     os.remove( temp_file )
-        # else:
-        #     os.remove( fname )
+        if os.path.exists( temp_file ) :
+            shutil.copy2( temp_file , fname )
+            os.remove( temp_file )
+        else:
+            os.remove( fname )
 
     def on_completion(self, result):
 
@@ -195,6 +190,7 @@ class FlowProject( sublime_plugin.EventListener ):
     def on_post_save_async(self, view):
         pt = view.sel()[0].b
         scope = str(view.scope_name(pt))
+        fname = view.file_name()
 
         if "source.flow" in scope:
             if fname == self.flow_file:
@@ -276,6 +272,42 @@ class FlowProject( sublime_plugin.EventListener ):
 
         return _result
 
-print("[flow] hello flow")
-from .commands import *
+
+
+def run_process( args ):
+    return subprocess.Popen(args, stdout=subprocess.PIPE, startupinfo=STARTUP_INFO).communicate()[0]
+
+def panel(_window, options, done, flags=0, sel_index=0, on_highlighted=None):
+    sublime.set_timeout(lambda: _window.show_quick_panel(options, done, flags, sel_index, on_highlighted), 10)
+
+
+class FlowCompletionCallbackCommand( sublime_plugin.WindowCommand  ):
+
+    def run( self, result=None, **kwargs ) :
+        _flow_.on_completion(result)
+
+#force reload
+
+def force_reload():
+    modules_to_load = [
+        'flow.commands.flow_set_project_file',
+        'flow.commands.flow_set_target_build',
+        'flow.commands.flow_show_status',
+        'flow.commands.flow_run_build',
+        'flow.haxe_parse_completion_list'
+    ]
+
+    import imp
+    for mod in modules_to_load:
+        if sys.modules[mod] != None:
+            # print("reload " + mod)
+            imp.reload(sys.modules[mod])
+
+force_reload()
+
+from .commands.flow_show_status import FlowShowStatus
+from .commands.flow_set_target_build import FlowSetTargetBuild
+from .commands.flow_set_project_file import FlowSetProjectFile
+from .commands.flow_run_build import FlowDoBuild, FlowRunBuild
+
 
