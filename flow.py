@@ -214,6 +214,7 @@ class FlowProject( sublime_plugin.EventListener ):
     def get_working_dir(self):
         cwd = os.path.dirname(self.flow_file)
         cwd = os.path.join( cwd, self.info_json['paths']['build'] )
+        cwd = os.path.normpath( cwd )
 
         return cwd
 
