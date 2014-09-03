@@ -152,8 +152,8 @@ class FlowProject( sublime_plugin.EventListener ):
         filename = os.path.basename( fname )
         temp_file = os.path.join( folder , filename + ".tmp" )
 
-        if os.path.exists( fname ):
-            shutil.copy2( fname , temp_file )
+        # if os.path.exists( fname ):
+        #     shutil.copy2( fname , temp_file )
 
         view.run_command("save")
 
@@ -164,10 +164,10 @@ class FlowProject( sublime_plugin.EventListener ):
         filename = os.path.basename( fname )
         temp_file = os.path.join( folder , filename + ".tmp" )
 
-        if os.path.exists( temp_file ) :
-            os.remove( temp_file )
-        else:
-            os.remove( fname )
+        # if os.path.exists( temp_file ) :
+        #     os.remove( temp_file )
+        # else:
+        #     os.remove( fname )
 
     def on_completion(self, result):
 
