@@ -85,6 +85,12 @@ class FlowProject( sublime_plugin.EventListener ):
 
     def on_query_completions(self, view, prefix, locations):
 
+        pt = view.sel()[0].b
+        scope = str(view.scope_name(pt))
+
+        if "comment" in scope:
+            return []
+
         if self.completion_data is not None:
             return self.parse_completion_data()
 
