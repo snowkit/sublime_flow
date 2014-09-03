@@ -73,6 +73,8 @@ class FlowDoBuild( ExecCommand ):
         self.output_view.settings().set("result_base_dir", working_dir)
 
         if working_dir != "":
+            if not os.path.exists(working_dir):
+                os.makedirs(working_dir)
             os.chdir(working_dir)
 
         if not quiet:
