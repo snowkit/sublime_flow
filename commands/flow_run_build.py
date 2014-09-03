@@ -12,7 +12,7 @@ AsyncProcess = stexec.AsyncProcess
 print('flow / load run build')
 
 class FlowRunBuild( sublime_plugin.WindowCommand ):
-    def run(self):
+    def run(self, file_regex=""):
         view = self.window.active_view()
 
         if not FlowProject.flow.flow_file:
@@ -42,7 +42,9 @@ class FlowRunBuild( sublime_plugin.WindowCommand ):
         print("[flow] build " + " ".join(flow_cmd))
 
         self.window.run_command("flow_do_build", {
-            "cmd": flow_cmd
+            "cmd": flow_cmd,
+            "file_regex" : file_regex,
+            "working_dir": FlowProject.flow.get_working_dir()
         })
 
 class FlowDoBuild( ExecCommand ):
@@ -65,6 +67,10 @@ class FlowDoBuild( ExecCommand ):
         self.encoding = encoding
         self.quiet = quiet
         self.proc = None
+
+        self.output_view.settings().set("result_file_regex", file_regex)
+        self.output_view.settings().set("result_line_regex", line_regex)
+        self.output_view.settings().set("result_base_dir", working_dir)
 
         if working_dir != "":
             os.chdir(working_dir)

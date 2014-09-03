@@ -126,8 +126,7 @@ class FlowProject( sublime_plugin.EventListener ):
         ch = view.substr(word)[0]
         offset = sel.begin()
         line, column = view.rowcol(offset)
-        cwd = os.path.dirname(self.flow_file)
-        cwd = os.path.join( cwd, self.info_json['paths']['build'] )
+        cwd = self.get_working_dir()
         filename = fname
 
         if ch == "." or ch == "(":
@@ -211,6 +210,12 @@ class FlowProject( sublime_plugin.EventListener ):
         if "source.haxe" in scope:
             fname = view.file_name()
             self.completion(view, fname)
+
+    def get_working_dir(self):
+        cwd = os.path.dirname(self.flow_file)
+        cwd = os.path.join( cwd, self.info_json['paths']['build'] )
+
+        return cwd
 
     def get_status(self):
 
