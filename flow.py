@@ -71,7 +71,8 @@ class FlowProject( sublime_plugin.EventListener ):
 
     def on_query_completions(self, view, prefix, locations):
 
-        print(prefix)
+        if "source.haxe" not in scope:
+            return
 
         pt = view.sel()[0].b
         scope = str(view.scope_name(pt))
@@ -299,7 +300,7 @@ def force_reload():
 
     import imp
     for mod in modules_to_load:
-        if sys.modules[mod] != None:
+        if sys.modules.get(mod,None) != None:
             # print("reload " + mod)
             imp.reload(sys.modules[mod])
 

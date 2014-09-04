@@ -1,0 +1,6 @@
+{
+    "name":"flow",
+    "version": "1.0.0-alpha",
+    "url": "https://github.com/underscorediscovery/sublime-flow",
+    "description": "flow syntax highlighting, code completion, and build management"
+}
