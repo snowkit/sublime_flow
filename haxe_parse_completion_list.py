@@ -38,7 +38,10 @@ def haxe_parse_completion_list(_list):
             _type = node.find('t').text
 
             if _type is None:
-                _type = "-"
+                if _name[0].islower():
+                    _type = "package"
+                else:
+                    _type = _name
 
             if is_function(_type):
                 members.append( ( _name+'\tfunction', _name ) )
