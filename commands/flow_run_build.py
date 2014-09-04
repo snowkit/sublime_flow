@@ -1,7 +1,6 @@
 import sublime, sublime_plugin
 import sys, os, subprocess
 
-from ..flow import _flow_
 
 import Default
 stexec = getattr( Default , "exec" )
@@ -10,6 +9,7 @@ AsyncProcess = stexec.AsyncProcess
 
 class FlowRunBuild( sublime_plugin.WindowCommand ):
     def run(self, file_regex=""):
+        from ..flow import _flow_
 
         view = self.window.active_view()
 

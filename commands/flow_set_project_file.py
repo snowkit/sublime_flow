@@ -1,16 +1,17 @@
 import sublime, sublime_plugin
 
 
-from ..flow import _flow_
-
 
 class FlowSetProjectFile( sublime_plugin.WindowCommand ):
 
     def run(self):
+        from ..flow import _flow_
+
         view = self.window.active_view()
         _flow_.set_flow_file( view.file_name() )
 
     def is_visible(self):
+        from ..flow import _flow_
 
         view = self.window.active_view()
         pt = view.sel()[0].b

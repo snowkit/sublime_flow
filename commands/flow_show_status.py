@@ -1,15 +1,17 @@
 import sublime, sublime_plugin
 
-from ..flow import _flow_, panel
 
 class FlowShowStatus( sublime_plugin.WindowCommand ):
 
     def run(self):
+        from ..flow import _flow_, panel
 
         view = self.window.active_view()
         panel(self.window, _flow_.get_status(), self.on_select)
 
     def on_select(self, index):
+        from ..flow import _flow_
+
             #the flow file
         if index == 0:
             if _flow_.flow_file:
