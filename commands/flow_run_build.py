@@ -70,6 +70,8 @@ class FlowDoBuild( ExecCommand ):
         self.output_view.settings().set("result_file_regex", file_regex)
         self.output_view.settings().set("result_line_regex", line_regex)
         self.output_view.settings().set("result_base_dir", working_dir)
+        self.output_view.settings().set("scroll_past_end", False)
+        self.output_view.settings().set("word_wrap", True)
 
         if working_dir != "":
             if not os.path.exists(working_dir):
@@ -99,4 +101,3 @@ class FlowDoBuild( ExecCommand ):
         # print(output)
 
 print("[flow] loaded run build")
-
