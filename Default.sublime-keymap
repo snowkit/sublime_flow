@@ -36,6 +36,18 @@
         ]
     },
     {
+        "keys": ["ctrl+i"],
+        "command": "haxe_generate_import",
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.haxe"
+            }
+        ]
+    },
+    {
         "keys": ["("],
         "command": "chained_actions",
         "args": {
