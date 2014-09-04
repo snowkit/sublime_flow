@@ -71,11 +71,11 @@ class FlowProject( sublime_plugin.EventListener ):
 
     def on_query_completions(self, view, prefix, locations):
 
-        if "source.haxe" not in scope:
-            return
-
         pt = view.sel()[0].b
         scope = str(view.scope_name(pt))
+
+        if "source.haxe" not in scope:
+            return
 
         if "comment" in scope:
             return []
