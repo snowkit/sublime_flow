@@ -291,11 +291,11 @@ class FlowCompletionCallbackCommand( sublime_plugin.WindowCommand  ):
 
 def force_reload():
     modules_to_load = [
-        'flow.commands.flow_set_project_file',
-        'flow.commands.flow_set_target_build',
-        'flow.commands.flow_show_status',
-        'flow.commands.flow_run_build',
-        'flow.haxe_parse_completion_list'
+        'sublime-flow.commands.flow_set_project_file',
+        'sublime-flow.commands.flow_set_target_build',
+        'sublime-flow.commands.flow_show_status',
+        'sublime-flow.commands.flow_run_build',
+        'sublime-flow.haxe_parse_completion_list'
     ]
 
     import imp
