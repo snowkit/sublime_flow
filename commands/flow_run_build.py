@@ -94,11 +94,9 @@ class FlowDoBuild( ExecCommand ):
 
     def finish(self, *args, **kwargs):
 
-        super(FlowDoBuild, self).finish(*args, **kwargs)
+        super(ExecCommand, self).finish(*args, **kwargs)
         output = self.output_view.substr(sublime.Region(0, self.output_view.size()))
-        print(output)
-
-
+        # print(output)
 
 print("[flow] loaded run build")
 
