@@ -16,7 +16,7 @@ def haxe_parse_completion_list(_list):
     except ET.ParseError as e:
         #if there was a parse error, this is an error from haxe,
         #so we will show it for now as a completion with blank insert
-        _error = _list.split('\n')
+        _error = _list.splitlines()
 
         _error_result = []
 
