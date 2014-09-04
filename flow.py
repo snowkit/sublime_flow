@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, subprocess, shutil, json, codecs, tempfile
+import sys, os, subprocess, shutil, json, codecs, time
 
 import sublime, sublime_plugin
 from .haxe_parse_completion_list import *
@@ -82,36 +82,16 @@ class FlowProject( sublime_plugin.EventListener ):
         if "source.haxe" not in scope:
             return
 
-        if self.completion_data is not None:
-            return self.parse_completion_data()
+        return self.completion(view, view.file_name())
 
-        _go = self.completion(view, view.file_name())
+        # return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
-        if not _go:
-            return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-
-        return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-
-    def parse_completion_data(self):
-        if self.completion_data is None:
-            return []
-
-        res = haxe_parse_completion_list(self.completion_data)
-        # print(res)
-
-        self.completion_data = None
-
-        return res
 
     def completion(self, view, fname):
 
-
-        if self.completion_pending:
-            return False
-
         if self.flow_file == "" or self.flow_file is None:
             sublime.status_message("No flow file, right click in a flow file! {}".format(str(self.flow_file)))
-            return False
+            return []
 
         if not self.info_json:
             sublime.status_message("no info/hxml for flow file, caching...")
@@ -121,7 +101,7 @@ class FlowProject( sublime_plugin.EventListener ):
         word = view.word(sel)
 
         if len(word) == 0:
-            return False
+            return []
 
         ch = view.substr(word)[0]
         code = view.substr(sublime.Region(0, view.size()))
@@ -135,7 +115,6 @@ class FlowProject( sublime_plugin.EventListener ):
 
             from sublime_haxe_completion.haxe_completion import _completionist_
 
-            self.save_file_for_completion(view, fname)
             self.completion_file = fname
             self.completion_view = view
             self.completion_data = None
@@ -143,11 +122,21 @@ class FlowProject( sublime_plugin.EventListener ):
             _hxml = self.info_json['hxml'].splitlines()
 
             self.completion_pending = True
-            _completionist_.complete(self.on_completion, cwd, filename, offset, _hxml)
 
-            return True
+            self.completion_start_time = time.time()
 
-        return False
+            self.save_file_for_completion(view, fname)
+
+            result = _completionist_.complete(cwd, filename, offset, _hxml)
+
+            self.restore_file_post_completion()
+
+            time_diff = time.time() - self.completion_start_time
+            print("[flow] completion took {}".format(time_diff))
+
+            return haxe_parse_completion_list(result)
+
+        return []
 
     def save_file_for_completion( self, view, fname ):
 
@@ -163,7 +152,11 @@ class FlowProject( sublime_plugin.EventListener ):
         f.write( code )
         f.close()
 
+        print("saved file for completion")
+
     def restore_file_post_completion( self ):
+
+        print("restore file post completion")
 
         view = self.completion_view
         fname = self.completion_file
@@ -172,34 +165,11 @@ class FlowProject( sublime_plugin.EventListener ):
         temp_file = os.path.join( folder , "." + filename + ".tmp" )
 
         if os.path.exists( temp_file ) :
+            # print("do restore!")
             shutil.copy2( temp_file , fname )
             os.remove( temp_file )
         # else:
             # os.remove( fname )
-
-    def on_completion(self, result):
-
-        self.restore_file_post_completion()
-
-        view = self.completion_view
-        pt = view.sel()[0].b
-        scope = str(view.scope_name(pt))
-
-        if "source.haxe" not in scope:
-            return
-
-        self.completion_data = result
-        self.completion_pending = False
-
-            #this forces on_query_completion
-        view.run_command( "auto_complete" , {
-            "api_completions_only" : True,
-            "disable_auto_insert" : True,
-            "next_completion_if_showing" : False
-        })
-
-        self.completion_file = None
-        self.completion_view = None
 
     def on_post_save_async(self, view):
         pt = view.sel()[0].b
@@ -210,20 +180,6 @@ class FlowProject( sublime_plugin.EventListener ):
             if fname == self.flow_file:
                 self.refresh_info()
 
-        #when changing a flow file that is set as the active project,
-        #we automatically refresh the hxml so that the completion is reliable
-    def on_modified(self, view):
-
-        return
-
-        pt = view.sel()[0].b
-        scope = str(view.scope_name(pt))
-
-        if "source.haxe" in scope:
-            if self.completion_pending:
-                return
-            fname = view.file_name()
-            self.completion(view, fname)
 
     def get_working_dir(self):
         cwd = os.path.dirname(self.flow_file)
@@ -293,7 +249,7 @@ class FlowProject( sublime_plugin.EventListener ):
 
 
 def run_process( args ):
-    return subprocess.Popen(args, stdout=subprocess.PIPE, startupinfo=STARTUP_INFO).communicate()[0]
+    return subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, startupinfo=STARTUP_INFO).communicate()[0]
 
 def panel(_window, options, done, flags=0, sel_index=0, on_highlighted=None):
     sublime.set_timeout(lambda: _window.show_quick_panel(options, done, flags, sel_index, on_highlighted), 10)

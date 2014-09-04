@@ -6,10 +6,14 @@ def haxe_parse_completion_list(_list):
     if _list is None:
         return []
 
-    # print(_list)
+    #print(_list)
 
     try:
+
         root = ET.fromstring(str(_list))
+
+        print("parsed ok")
+
     except ET.ParseError as e:
         #if there was a parse error, this is an error from haxe,
         #so we will show it for now as a completion with blank insert
