@@ -130,7 +130,7 @@ class FlowProject( sublime_plugin.EventListener ):
 
         if ch == "." or ch == "(":
 
-            from haxe_completion.haxe_completion import _completionist_
+            from sublime_haxe_completion.haxe_completion import _completionist_
 
             self.save_file_for_completion(view, fname)
             self.completion_file = fname
@@ -295,18 +295,21 @@ def panel(_window, options, done, flags=0, sel_index=0, on_highlighted=None):
 
 def force_reload():
     modules_to_load = [
-        'sublime-flow.commands.flow_set_project_file',
-        'sublime-flow.commands.flow_set_target_build',
-        'sublime-flow.commands.flow_show_status',
-        'sublime-flow.commands.flow_run_build',
-        'sublime-flow.haxe_parse_completion_list'
+        'sublime_flow.commands.flow_set_project_file',
+        'sublime_flow.commands.flow_set_target_build',
+        'sublime_flow.commands.flow_show_status',
+        'sublime_flow.commands.flow_run_build',
+        'sublime_flow.haxe_parse_completion_list'
     ]
 
     import imp
     for mod in modules_to_load:
         if sys.modules.get(mod,None) != None:
-            # print("reload " + mod)
-            imp.reload(sys.modules[mod])
+            try:
+                # print("reload " + mod)
+                imp.reload(sys.modules[mod])
+            except:
+                pass
 
 from .commands.flow_show_status import FlowShowStatus
 from .commands.flow_set_target_build import FlowSetTargetBuild
