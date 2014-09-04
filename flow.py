@@ -82,7 +82,10 @@ class FlowProject( sublime_plugin.EventListener ):
         if "source.haxe" not in scope:
             return
 
-        return self.completion(view, view.file_name())
+        _res = self.completion(view, view.file_name())
+
+        if(len(_res)):
+            return (_res, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
         # return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 

@@ -1,4 +1,5 @@
 
+import sublime, sublime_plugin
 import xml.etree.ElementTree as ET
 
 def haxe_parse_completion_list(_list):
@@ -6,7 +7,7 @@ def haxe_parse_completion_list(_list):
     if _list is None:
         return []
 
-    #print(_list)
+    # print(_list)
 
     try:
 
@@ -50,7 +51,10 @@ def haxe_parse_completion_list(_list):
             else:
                 members.append( ( _name+'\t'+_type, _name ) )
 
-        return members
+        if len(members):
+            return members
+        else:
+            return [('No members/properties', '')]
 
         #type is function arguments and the like
     elif root.tag == 'type':
@@ -119,8 +123,7 @@ def parse_type(_type):
         _args, _return = parse_args(_type)
 
     if len(_args) == 1:
-        if _args[0] in ['Void','Dynamic']:
-            return []
+        return []
 
 
     for item in _args:
