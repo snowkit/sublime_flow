@@ -109,18 +109,24 @@ def parse_type(_type):
         return []
 
     result = []
+    _args = []
 
-    _args, _return = parse_args(_type)
+    if _type.find(':') == -1:
+        _args = [ _type.strip() ]
+    else:
+        _args, _return = parse_args(_type)
 
     if len(_args) == 1:
-        if _args[0] == 'Void':
+        if _args[0] in ['Void','Dynamic']:
             return []
 
+
     for item in _args:
-        node = item.split(' : ')
+        node = item.split(':')
         _name = node[0]
         _typename = "Unknown"
-        if(len(node) > 1):
+
+        if len(node) > 1:
             _typename = node[1]
 
         result.append((_name+'\t'+_typename, _name))

@@ -35,6 +35,7 @@ class FlowProject( sublime_plugin.EventListener ):
         self.target = ""
         self.info_json = None
         self.completion_data = None
+        self.completion_pending = False
 
         self.system = self.get_system()
         self.target = self.system
@@ -102,6 +103,9 @@ class FlowProject( sublime_plugin.EventListener ):
 
     def completion(self, view, fname):
 
+        if self.completion_pending:
+            return
+
         if self.flow_file == "" or self.flow_file is None:
             sublime.status_message("No flow file, right click in a flow file! {}".format(str(self.flow_file)))
             return
@@ -126,31 +130,28 @@ class FlowProject( sublime_plugin.EventListener ):
 
         if ch == "." or ch == "(":
 
-            print("[flow] start completion in {0}, ch is {1}".format(cwd,ch))
+            from haxe_completion.haxe_completion import _completionist_
 
             self.save_file_for_completion(view, fname)
             self.completion_file = fname
             self.completion_view = view
             self.completion_data = None
 
-            view.window().run_command('haxe_completion_complete', {
-                "on_complete":'flow_completion_callback',
-                "cwd":cwd,
-                "fname":filename,
-                "offset":offset,
-                "hxml":self.info_json['hxml'].splitlines()
-            })
+            _hxml = self.info_json['hxml'].splitlines()
+
+            self.completion_pending = True
+
+            _completionist_.complete(self.on_completion, cwd, filename, offset, _hxml)
 
     def save_file_for_completion( self, view, fname ):
 
         folder = os.path.dirname(fname)
         filename = os.path.basename( fname )
-        temp_file = os.path.join( folder , filename + ".tmp" )
+        temp_file = os.path.join( folder , "." + filename + ".tmp" )
 
         if os.path.exists( fname ):
             shutil.copy2( fname , temp_file )
 
-        # view.run_command("save")
         code = view.substr(sublime.Region(0, view.size()))
         f = codecs.open( fname , "wb" , "utf-8" , "ignore" )
         f.write( code )
@@ -158,18 +159,21 @@ class FlowProject( sublime_plugin.EventListener ):
 
     def restore_file_post_completion( self ):
 
+        view = self.completion_view
         fname = self.completion_file
         folder = os.path.dirname( fname )
         filename = os.path.basename( fname )
-        temp_file = os.path.join( folder , filename + ".tmp" )
+        temp_file = os.path.join( folder , "." + filename + ".tmp" )
 
         if os.path.exists( temp_file ) :
             shutil.copy2( temp_file , fname )
             os.remove( temp_file )
-        else:
-            os.remove( fname )
+        # else:
+            # os.remove( fname )
 
     def on_completion(self, result):
+
+        self.restore_file_post_completion()
 
         view = self.completion_view
         pt = view.sel()[0].b
@@ -187,10 +191,9 @@ class FlowProject( sublime_plugin.EventListener ):
             "next_completion_if_showing" : False
         })
 
-        self.restore_file_post_completion()
-
         self.completion_file = None
         self.completion_view = None
+        self.completion_pending = False
 
     def on_post_save_async(self, view):
         pt = view.sel()[0].b
@@ -204,11 +207,13 @@ class FlowProject( sublime_plugin.EventListener ):
         #when changing a flow file that is set as the active project,
         #we automatically refresh the hxml so that the completion is reliable
     def on_modified_async(self, view):
+
         pt = view.sel()[0].b
         scope = str(view.scope_name(pt))
-        fname = view.file_name()
 
         if "source.haxe" in scope:
+            if self.completion_pending:
+                return
             fname = view.file_name()
             self.completion(view, fname)
 
@@ -286,11 +291,6 @@ def panel(_window, options, done, flags=0, sel_index=0, on_highlighted=None):
     sublime.set_timeout(lambda: _window.show_quick_panel(options, done, flags, sel_index, on_highlighted), 10)
 
 
-class FlowCompletionCallbackCommand( sublime_plugin.WindowCommand  ):
-
-    def run( self, result=None, **kwargs ) :
-        _flow_.on_completion(result)
-
 #force reload
 
 def force_reload():
@@ -308,11 +308,10 @@ def force_reload():
             # print("reload " + mod)
             imp.reload(sys.modules[mod])
 
-force_reload()
-
 from .commands.flow_show_status import FlowShowStatus
 from .commands.flow_set_target_build import FlowSetTargetBuild
 from .commands.flow_set_project_file import FlowSetProjectFile
 from .commands.flow_run_build import FlowDoBuild, FlowRunBuild
 
+force_reload()
 
