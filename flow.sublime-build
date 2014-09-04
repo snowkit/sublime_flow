@@ -1,5 +1,5 @@
 {
     "target": "flow_run_build",
     "file_regex" : "^([^:]*\\.hx):([0-9]+):.*$",
-    "selector": "source.python, source.haxe"
+    "selector": "source.flow, source.haxe"
 }
