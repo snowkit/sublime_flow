@@ -34,6 +34,16 @@
                 "operand": "source.flow,source.haxe"
             }
         ]
+    },
+    {
+        "keys": ["("],
+        "command": "chained_actions",
+        "args": {
+            "actions":["insert_snippet","auto_complete"],
+            "args":[{"contents": "(${0:$SELECTION})"},{}]
+        },
+        "context": [
+            {"key": "selector", "operator": "equal", "operand": "source.haxe"}
+        ]
     }
-
 ]

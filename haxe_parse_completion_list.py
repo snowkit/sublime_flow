@@ -111,7 +111,7 @@ def parse_type(_type):
     result = []
     _args = []
 
-    if _type.find(':') == -1:
+    if _type.find(':') == -1 and _type.find('->') == -1:
         _args = [ _type.strip() ]
     else:
         _args, _return = parse_args(_type)

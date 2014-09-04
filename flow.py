@@ -82,13 +82,15 @@ class FlowProject( sublime_plugin.EventListener ):
         if "source.haxe" not in scope:
             return
 
-        if "comment" in scope:
-            return []
-
         if self.completion_data is not None:
             return self.parse_completion_data()
 
-        return []
+        _go = self.completion(view, view.file_name())
+
+        if not _go:
+            return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+
+        return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
     def parse_completion_data(self):
         if self.completion_data is None:
@@ -103,12 +105,13 @@ class FlowProject( sublime_plugin.EventListener ):
 
     def completion(self, view, fname):
 
+
         if self.completion_pending:
-            return
+            return False
 
         if self.flow_file == "" or self.flow_file is None:
             sublime.status_message("No flow file, right click in a flow file! {}".format(str(self.flow_file)))
-            return
+            return False
 
         if not self.info_json:
             sublime.status_message("no info/hxml for flow file, caching...")
@@ -118,7 +121,7 @@ class FlowProject( sublime_plugin.EventListener ):
         word = view.word(sel)
 
         if len(word) == 0:
-            return
+            return False
 
         ch = view.substr(word)[0]
         code = view.substr(sublime.Region(0, view.size()))
@@ -140,8 +143,11 @@ class FlowProject( sublime_plugin.EventListener ):
             _hxml = self.info_json['hxml'].splitlines()
 
             self.completion_pending = True
-
             _completionist_.complete(self.on_completion, cwd, filename, offset, _hxml)
+
+            return True
+
+        return False
 
     def save_file_for_completion( self, view, fname ):
 
@@ -183,6 +189,7 @@ class FlowProject( sublime_plugin.EventListener ):
             return
 
         self.completion_data = result
+        self.completion_pending = False
 
             #this forces on_query_completion
         view.run_command( "auto_complete" , {
@@ -193,7 +200,6 @@ class FlowProject( sublime_plugin.EventListener ):
 
         self.completion_file = None
         self.completion_view = None
-        self.completion_pending = False
 
     def on_post_save_async(self, view):
         pt = view.sel()[0].b
@@ -206,7 +212,9 @@ class FlowProject( sublime_plugin.EventListener ):
 
         #when changing a flow file that is set as the active project,
         #we automatically refresh the hxml so that the completion is reliable
-    def on_modified_async(self, view):
+    def on_modified(self, view):
+
+        return
 
         pt = view.sel()[0].b
         scope = str(view.scope_name(pt))
@@ -290,6 +298,11 @@ def run_process( args ):
 def panel(_window, options, done, flags=0, sel_index=0, on_highlighted=None):
     sublime.set_timeout(lambda: _window.show_quick_panel(options, done, flags, sel_index, on_highlighted), 10)
 
+# http://stackoverflow.com/a/10863489/2503795
+class ChainedActionsCommand(sublime_plugin.TextCommand):
+    def run(self, edit, actions, args):
+        for i, action in enumerate(actions):
+            self.view.run_command(action, args[i])
 
 #force reload
 
