@@ -84,11 +84,12 @@ class FlowProject( sublime_plugin.EventListener ):
 
         _res = self.completion(view, view.file_name())
 
-        if(len(_res)):
-            return (_res, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-
-        # return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-
+        if _res is None:
+            #explicitly no completion
+            return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+        else:
+            if(len(_res)):
+                return (_res, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
     def completion(self, view, fname):
 

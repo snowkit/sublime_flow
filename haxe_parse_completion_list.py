@@ -65,7 +65,10 @@ def haxe_parse_completion_list(_list):
         if parsed is not None:
             args = parsed
 
-        return args
+        if len(args):
+            return args
+        else:
+            return None
 
     return []
 
@@ -123,9 +126,10 @@ def parse_type(_type):
         _args, _return = parse_args(_type)
 
     if len(_args) == 1:
-        return []
+        if _args[0] in ['Void', 'Dynamic']:
+            return []
 
-
+    _arg_str = ", ".join(_args)
     for item in _args:
         node = item.split(':')
         _name = node[0]
@@ -134,7 +138,7 @@ def parse_type(_type):
         if len(node) > 1:
             _typename = node[1]
 
-        result.append((_name+'\t'+_typename, _name))
+        result.append((_name+'\t'+_typename, _arg_str))
 
     return result
 
