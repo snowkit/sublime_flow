@@ -68,6 +68,10 @@ class FlowProject( sublime_plugin.EventListener ):
 
         if self.info_json_src:
             self.info_json = json.loads(self.info_json_src)
+            if not self.info_json:
+                print("[flow] refresh info/hxml failed! info_json was null")
+        else:
+            print("[flow] refresh info/hxml failed! info_json_src was not returned from haxelib run flow, is your flow up to date?")
 
     def on_query_completions(self, view, prefix, locations):
 
