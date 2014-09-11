@@ -138,7 +138,7 @@ def parse_type(_type):
         if len(node) > 1:
             _typename = node[1]
 
-        result.append((_name+'\t'+_typename, _arg_str))
+        result.append((_name+'\t'+_typename, _name))
 
     return result
 
