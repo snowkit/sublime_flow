@@ -23,6 +23,9 @@ class FlowRunBuild( sublime_plugin.WindowCommand ):
         if _flow_.build_only:
             _cmd = "build"
 
+        if _flow_.launch_only:
+            _cmd = "launch"
+
 
         flow_build_args = [
             "haxelib", "run", "flow",

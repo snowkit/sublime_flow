@@ -48,6 +48,28 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
 
             print("[flow] toggle build only, now at " + str(_flow_.build_only))
 
+            #launch only flag
+        if index == 5:
+            if _flow_.launch_only:
+                _flow_.launch_only = False
+            else:
+                _flow_.launch_only = True
+
+            print("[flow] toggle launch only, now at " + str(_flow_.launch_only))
+
+            #package
+        if index == 6:
+            pass
+
+            #clean output
+        if index == 7:
+            pass
+
+            #clean build
+        if index == 8:
+            pass
+
+
     def is_visible(self):
         view = self.window.active_view()
         pt = view.sel()[0].b
