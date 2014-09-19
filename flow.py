@@ -207,10 +207,10 @@ class FlowProject( sublime_plugin.EventListener ):
         else:
             _result.append(['flow target', self.system])
 
-        _result.append(['Toggle debug build', "currently debug : " + str(self.build_debug).lower() ])
-        _result.append(['Toggle verbose build', "currently verbose : " + str(self.build_verbose).lower() ])
-        _result.append(['Toggle build only', "currently build only : " + str(self.build_only).lower() ])
-        _result.append(['Toggle launch only', "currently launch only : " + str(self.launch_only).lower() ])
+        _result.append(['Toggle debug build', "currently : " + str(self.build_debug).lower() ])
+        _result.append(['Toggle verbose build', "currently : " + str(self.build_verbose).lower() ])
+        _result.append(['Toggle build only', "currently : " + str(self.build_only).lower() ])
+        _result.append(['Toggle launch only', "currently : " + str(self.launch_only).lower() ])
         # _result.append(['Package output folder', "generates a zip to output folder"])
         # _result.append(['Clean output folder', "delete the output folder"])
         # _result.append(['Clean build output', "delete the build folder"])
