@@ -140,6 +140,9 @@ def parse_type(_type):
 
         result.append((_name+'\t'+_typename, _name))
 
+    if(len(result) == 1):
+        result.append(('\t-',' '))
+
     return result
 
 #returns True if the string is completion info for a function

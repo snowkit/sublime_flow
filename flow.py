@@ -157,11 +157,11 @@ class FlowProject( sublime_plugin.EventListener ):
         f.write( code )
         f.close()
 
-        print("saved file for completion")
+        print("[flow] saved file for completion")
 
     def restore_file_post_completion( self ):
 
-        print("restore file post completion")
+        print("[flow] restore file post completion")
 
         view = self.completion_view
         fname = self.completion_file
