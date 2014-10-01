@@ -246,11 +246,16 @@ class FlowProject( sublime_plugin.EventListener ):
         _result.append(['iOS', 'mobile, native ios project'])
         _result.append(['Web', 'web, web based app'])
 
-        _invalid = self.info_json['targets_invalid']
+        if self.info_json:
 
-        _result[:] = [_item for _item in _result if not _item[0].lower() in _invalid ]
+            _invalid = self.info_json['targets_invalid']
+            _result[:] = [_item for _item in _result if not _item[0].lower() in _invalid ]
 
-        _result.insert(0, ['unavailable from ' + self.system, ", ".join(_invalid) ])
+            _result.insert(0, ['unavailable from ' + self.system, ", ".join(_invalid) ])
+
+        else :
+
+            _result.append(['Error', 'Failed to retrieve flow info from project. View -> Show Console for more info to report!'])
 
         return _result
 
