@@ -52,10 +52,25 @@
         "command": "chained_actions",
         "args": {
             "actions":["insert_snippet","auto_complete"],
-            "args":[{"contents": "(${0:$SELECTION})"},{}]
+            "args":[{"contents": "("},{}]
         },
         "context": [
-            {"key": "selector", "operator": "equal", "operand": "source.haxe"}
+            { "key": "selector", "operator": "equal", "operand": "source.haxe" },
+            { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+            { "key": "setting.auto_match_enabled", "operator": "equal", "operand": false }
+        ]
+    },
+    {
+        "keys": ["("],
+        "command": "chained_actions",
+        "args": {
+            "actions":["insert_snippet","auto_complete"],
+            "args":[{"contents": "($0)"},{}]
+        },
+        "context": [
+            { "key": "selector", "operator": "equal", "operand": "source.haxe" },
+            { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+            { "key": "setting.auto_match_enabled", "operator": "equal", "operand": true }
         ]
     }
 ]
