@@ -1,0 +1,6 @@
+[
+   { "id": "flow-set-project-space", "caption": "-" },
+   { "id": "flow-show-status", "command": "flow_show_status", "caption": "flow status" },
+   { "id": "flow-set-project-file", "command": "flow_set_project_file", "caption": "Set as current flow project" },
+   { "id": "flow-set-target-build", "command": "flow_set_target_build", "caption": "Set build target" }
+]
