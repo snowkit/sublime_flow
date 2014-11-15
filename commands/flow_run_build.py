@@ -101,13 +101,17 @@ class FlowRunBuild( ExecCommand ):
     def run( self, cmd = [],  shell_cmd = None, file_regex = "", line_regex = "", working_dir = "",
             encoding = None, env = {}, quiet = False, kill = False, **kwargs):
 
-        if kill:
+        try:
             if self.proc:
                 self.finish(self.proc)
                 self.proc.kill()
                 self.proc = None
-                sublime.status_message("Build stopped")
-            return
+
+                if kill:
+                    sublime.status_message("Build stopped")
+                    return
+        except AttributeError as e:
+            pass
 
         from ..flow import _flow_
 
