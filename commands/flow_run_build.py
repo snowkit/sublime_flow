@@ -65,10 +65,14 @@ class AsyncProcess(default_AsyncProcess):
                 stderr=subprocess.PIPE, startupinfo=startupinfo, env=proc_env, shell=False,
                 preexec_fn=os.setsid)
         else:
+            preexec = None
+            if sys.platform != "win32":
+                preexec = os.setsid
+
             # Old style build system, just do what it asks
             self.proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE, startupinfo=startupinfo, env=proc_env,
-                shell=shell, preexec_fn=os.setsid)
+                shell=shell, preexec_fn=preexec)
 
         if path:
             os.environ["PATH"] = old_path
