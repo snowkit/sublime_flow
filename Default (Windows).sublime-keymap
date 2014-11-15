@@ -1,0 +1,7 @@
+[
+    {
+        "keys": ["ctrl+break"],
+        "command": "flow_run_build", "args": {"kill": true},
+        "context": [ { "key": "selector", "operator": "equal", "operand": "source.haxe, source.flow" } ]
+    }
+]
