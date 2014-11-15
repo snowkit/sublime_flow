@@ -102,16 +102,19 @@ class FlowRunBuild( ExecCommand ):
             encoding = None, env = {}, quiet = False, kill = False, **kwargs):
 
         try:
-            if self.proc:
-                self.finish(self.proc)
+            if self.proc and not kill:
                 self.proc.kill()
                 self.proc = None
-
-                if kill:
-                    sublime.status_message("Build stopped")
-                    return
         except AttributeError as e:
             pass
+
+        if kill:
+            self.proc.kill()
+            self.finish(self.proc)
+            self.proc = None
+            sublime.status_message("Build stopped")
+
+            return
 
         from ..flow import _flow_
 
@@ -194,6 +197,8 @@ class FlowRunBuild( ExecCommand ):
             self.append_string(proc, ("\n[ %d build errors ]\n\n") % len(errs))
 
         super(FlowRunBuild, self).finish(proc)
+
+        self.proc = None
 
 
 print("[flow] loaded run build")
