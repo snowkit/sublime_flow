@@ -57,7 +57,8 @@
         "context": [
             { "key": "selector", "operator": "equal", "operand": "source.haxe" },
             { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
-            { "key": "setting.auto_match_enabled", "operator": "equal", "operand": false }
+            { "key": "setting.auto_match_enabled", "operator": "equal", "operand": false },
+            { "key": "preceding_text", "operator": "not_regex_contains", "operand": "(if|switch|function)", "match_all": true }
         ]
     },
     {
@@ -70,7 +71,8 @@
         "context": [
             { "key": "selector", "operator": "equal", "operand": "source.haxe" },
             { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
-            { "key": "setting.auto_match_enabled", "operator": "equal", "operand": true }
+            { "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+            { "key": "preceding_text", "operator": "not_regex_contains", "operand": "(if|switch|function)", "match_all": true }
         ]
     }
 ]
