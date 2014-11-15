@@ -297,7 +297,7 @@ def force_reload():
 from .commands.flow_show_status import FlowShowStatus
 from .commands.flow_set_target_build import FlowSetTargetBuild
 from .commands.flow_set_project_file import FlowSetProjectFile
-from .commands.flow_run_build import FlowDoBuild, FlowRunBuild
+from .commands.flow_run_build import FlowRunBuild
 from .commands.haxe_generate_import import HaxeGenerateImport
 
 force_reload()
@@ -305,5 +305,5 @@ force_reload()
 from .commands.flow_show_status import FlowShowStatus
 from .commands.flow_set_target_build import FlowSetTargetBuild
 from .commands.flow_set_project_file import FlowSetProjectFile
-from .commands.flow_run_build import FlowDoBuild, FlowRunBuild
+from .commands.flow_run_build import FlowRunBuild
 from .commands.haxe_generate_import import HaxeGenerateImport
