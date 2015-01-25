@@ -17,10 +17,10 @@ class FlowSetProjectFile( sublime_plugin.WindowCommand ):
         pt = view.sel()[0].b
         scope = view.scope_name(pt)
 
-        if not "source.flow" in scope:
-            return False
-        else:
+        if ("source.flow" in scope) or ("source.hxml" in scope):
             return True
+        else:
+            return False
 
 
 print("[flow] loaded set project file")

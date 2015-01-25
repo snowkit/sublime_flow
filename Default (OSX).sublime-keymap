@@ -2,6 +2,6 @@
     {
         "keys": ["ctrl+c"],
         "command": "flow_run_build", "args": {"kill": true},
-        "context": [ { "key": "selector", "operator": "equal", "operand": "source.haxe, source.flow" } ]
+        "context": [ { "key": "selector", "operator": "equal", "operand": "source.haxe, source.flow, source.hxml" } ]
     }
 ]

@@ -102,6 +102,38 @@ stexec.AsyncProcess = AsyncProcess
 
 class FlowRunBuild( ExecCommand ):
 
+    def cmds_for_flow(self,_flow_):
+
+        _cmd = "run"
+
+        if _flow_.build_only:
+            _cmd = "build"
+
+        if _flow_.launch_only:
+            _cmd = "launch"
+
+        cmd = [
+            "haxelib", "run", "flow",
+            _cmd, _flow_.target,
+            "--project", _flow_.flow_file
+        ]
+
+        if _flow_.build_debug:
+            cmd.append('--debug')
+
+        if _flow_.build_verbose:
+            cmd.append('--log')
+            cmd.append('3')
+
+        return cmd;
+
+    def cmds_for_haxe(self,_flow_):
+        cmd = [
+            "haxe", _flow_.flow_file
+        ]
+
+        return cmd;
+
     def run( self, cmd = [],  shell_cmd = None, file_regex = "", line_regex = "", working_dir = "",
             encoding = None, env = {}, quiet = False, kill = False, **kwargs):
 
@@ -129,29 +161,13 @@ class FlowRunBuild( ExecCommand ):
             print("[flow] build : no flow file")
             return
 
-        _cmd = "run"
-
-        if _flow_.build_only:
-            _cmd = "build"
-
-        if _flow_.launch_only:
-            _cmd = "launch"
-
-
-        cmd = [
-            "haxelib", "run", "flow",
-            _cmd, _flow_.target,
-            "--project", _flow_.flow_file
-        ]
+        cmd = []
+        if _flow_.flow_type is "flow":
+            cmd = self.cmds_for_flow(_flow_);
+        elif _flow_.flow_type is "hxml":
+            cmd = self.cmds_for_haxe(_flow_);
 
         working_dir = _flow_.get_working_dir()
-
-        if _flow_.build_debug:
-            cmd.append('--debug')
-
-        if _flow_.build_verbose:
-            cmd.append('--log')
-            cmd.append('3')
 
         print("[flow] build " + " ".join(cmd))
 

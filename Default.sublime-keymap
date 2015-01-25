@@ -7,7 +7,7 @@
             {
                 "key": "selector",
                 "operator": "equal",
-                "operand": "source.haxe,source.flow"
+                "operand": "source.haxe,source.flow,source.hxml"
             }
         ]
     },
@@ -19,7 +19,7 @@
             {
                 "key": "selector",
                 "operator": "equal",
-                "operand": "source.flow"
+                "operand": "source.flow, source.hxml"
             }
         ]
     },

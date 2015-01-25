@@ -33,7 +33,9 @@ class FlowProject( sublime_plugin.EventListener ):
         self.flow_path = "flow"
         self.flow_file = ""
         self.target = ""
+        self.flow_type = ""
         self.info_json = None
+        self.hxml_data = None
         self.completion_data = None
         self.completion_pending = False
 
@@ -62,18 +64,30 @@ class FlowProject( sublime_plugin.EventListener ):
     def refresh_info(self):
         print("[flow] refresh info/hxml on " + self.flow_file)
 
-        self.info_json_src = run_process([
-            "haxelib", "run", "flow",
-            "info", self.target,
-            "--project", self.flow_file
-        ]).decode("utf-8");
+        _fn, _ext = os.path.splitext(self.flow_file)
 
-        if self.info_json_src:
-            self.info_json = json.loads(self.info_json_src)
-            if not self.info_json:
-                print("[flow] refresh info/hxml failed! info_json was null")
-        else:
-            print("[flow] refresh info/hxml failed! info_json_src was not returned from haxelib run flow, is your flow up to date?")
+        if "flow" in _ext:
+            self.flow_type = "flow"
+            self.info_json_src = run_process([
+                "haxelib", "run", "flow",
+                "info", self.target,
+                "--project", self.flow_file
+            ]).decode("utf-8");
+
+            if self.info_json_src:
+                self.info_json = json.loads(self.info_json_src)
+                if not self.info_json:
+                    print("[flow] refresh info/hxml failed! info_json was null")
+                else:
+                    self.hxml_data = self.info_json['hxml']
+            else:
+                print("[flow] refresh info/hxml failed! info_json_src was not returned from haxelib run flow, is your flow up to date?")
+
+        elif "hxml" in _ext:
+            self.flow_type = "hxml"
+            print ("fetching hxml contents from " + self.flow_file)
+            with open(self.flow_file, 'r') as hxml_file:
+                self.hxml_data = hxml_file.read()
 
     def on_query_completions(self, view, prefix, locations):
 
@@ -98,7 +112,7 @@ class FlowProject( sublime_plugin.EventListener ):
             sublime.status_message("No flow file, right click in a flow file! {}".format(str(self.flow_file)))
             return []
 
-        if not self.info_json:
+        if not self.hxml_data:
             sublime.status_message("no info/hxml for flow file, caching...")
             self.refresh_info()
 
@@ -124,7 +138,7 @@ class FlowProject( sublime_plugin.EventListener ):
             self.completion_view = view
             self.completion_data = None
 
-            _hxml = self.info_json['hxml'].splitlines()
+            _hxml = self.hxml_data.splitlines()
 
             self.completion_pending = True
 
@@ -181,7 +195,7 @@ class FlowProject( sublime_plugin.EventListener ):
         scope = str(view.scope_name(pt))
         fname = view.file_name()
 
-        if "source.flow" in scope:
+        if ("source.flow" in scope) or ("source.hxml" in scope):
             if fname == self.flow_file:
                 self.refresh_info()
 
@@ -200,6 +214,9 @@ class FlowProject( sublime_plugin.EventListener ):
             _result.append(['flow file', self.flow_file])
         else:
             _result.append(['no flow file', 'specify a flow file first'])
+            return _result
+
+        if self.flow_type is not "flow":
             return _result
 
         if self.target:
@@ -237,6 +254,9 @@ class FlowProject( sublime_plugin.EventListener ):
         _result = []
 
         if not self.flow_file:
+            return _result
+
+        if "flow" not in self.flow_type:
             return _result
 
         _result.append(['Mac', 'desktop, native mac app'])

@@ -21,7 +21,7 @@ class FlowSetTargetBuild( sublime_plugin.WindowCommand ):
         view = self.window.active_view()
         pt = view.sel()[0].b
         scope = view.scope_name(pt)
-        if "source.flow" in scope:
+        if ("source.flow" in scope):
             if _flow_.flow_file:
                 return True
 
