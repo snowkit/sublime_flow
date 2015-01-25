@@ -28,6 +28,10 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
             else:
                 _flow_.build_debug = True
 
+                #need to refresh hxml, as it may differ
+                #for debug builds, including the debug conditional
+            _flow_.refresh_info();
+
             print("[flow] toggle build debug, now at " + str(_flow_.build_debug))
 
             #verbose flag

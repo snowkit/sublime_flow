@@ -67,12 +67,17 @@ class FlowProject( sublime_plugin.EventListener ):
         _fn, _ext = os.path.splitext(self.flow_file)
 
         if "flow" in _ext:
-            self.flow_type = "flow"
-            self.info_json_src = run_process([
+            cmd = [
                 "haxelib", "run", "flow",
                 "info", self.target,
                 "--project", self.flow_file
-            ]).decode("utf-8");
+            ];
+
+            if self.build_debug:
+                cmd.append('--debug')
+
+            self.flow_type = "flow"
+            self.info_json_src = run_process(cmd).decode("utf-8");
 
             if self.info_json_src:
                 self.info_json = json.loads(self.info_json_src)
