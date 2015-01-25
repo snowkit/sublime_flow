@@ -75,7 +75,7 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
         pt = view.sel()[0].b
         scope = view.scope_name(pt)
 
-        if ("source.flow" in scope) or ("source.hxml" in scope):
+        if ("source.flow" in scope) or ("source.hxml" in scope) or ("source.haxe" in scope):
             return True
         else:
             return False
