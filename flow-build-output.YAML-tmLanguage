@@ -1,0 +1,62 @@
+# [PackageDev] target_format: plist, ext: tmLanguage
+---
+name: flow build output
+scopeName: source.flow-build-output
+fileTypes: []
+uuid: a7f13cbf-e607-408a-802f-bfa6e909d299
+
+patterns:
+
+- include: '#errors'
+- include: '#flow_target_line'
+- include: '#flow_build_info'
+- include: '#flow_haxe_ver'
+- include: '#flow_logs'
+- include: '#haxe_trace_line'
+
+repository:
+
+  errors:
+    name: invalid.error.flow-build-output
+    match: >
+      (?:(^.*[.]hx):(\d+): (?:characters|lines) (\d+)-).+
+
+  flow_logs:
+    name: meta.logging.flow
+    match: ^(flow \/ )(.+ - )?(.+)
+    captures:
+      '1': { name: keyword.control.logging.flow }
+      '2': { name: storage.type.log_type.flow }
+      '3': { name: meta }
+
+  flow_target_line:
+    name: meta.logging.flow
+    match: ^(flow \/ )(target) is (mac|linux|windows|web|android) \( (.+) \)
+    captures:
+      '1': { name: keyword.control.logging.flow }
+      '2': { name: meta }
+      '3': { name: storage.type.target.flow }
+      '4': { name: storage.type.target_arch.flow }
+
+  flow_build_info:
+    name: meta.logging.flow
+    match: ^(flow \/ )(build only, )?(debug = true)
+    captures:
+      '1': { name: keyword.control.logging.flow }
+      '2': { name: meta }
+      '3': { name: entity.name.function.flow }
+
+  flow_haxe_ver:
+    name: meta.logging.flow
+    match: ^(flow \/ )(haxe version )(\d+.\d+.\d+)
+    captures:
+      '1': { name: keyword.control.logging.flow }
+      '2': { name: meta.haxe_version.flow }
+      '3': { name: storage.type.haxe_version.flow }
+
+  haxe_trace_line:
+    name: meta.logging.flow
+    match: (.+\.hx)[:](\d+)[:]
+    captures:
+      '1': { name: storage.type.trace_filename.flow }
+      '2': { name: constant.numeric.flow }

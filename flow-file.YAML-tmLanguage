@@ -1,0 +1,79 @@
+# [PackageDev] target_format: plist, ext: tmLanguage
+---
+name: flow file
+scopeName: source.flow
+fileTypes: ['flow']
+uuid: dda0dbdd-79ee-4944-a477-0b74c43d65b1
+
+patterns:
+
+- include: '#keyword_objects'
+- include: '#keyword_roots'
+- include: '#keyword_arrays'
+- include: '#keyword_string'
+
+- include: '#numeric_values'
+- include: '#bool_values'
+- include: '#string_values'
+
+- include: '#normal_objects'
+- include: '#normal_numeric'
+
+repository:
+
+  bool_values:
+    name: constant.numeric.flow
+    match: \"?\b(true|false)\b\"?
+
+  numeric_values:
+    name: constant.numeric.flow
+    match: \"?\b(\d+)\b\"?
+
+  string_values:
+    patterns:
+    - name: string.quoted.flow
+      begin: ("|')
+      end: ("|')
+
+  keyword_objects:
+    name: meta.keyword_objects.flow
+    match: \"?\b(dependencies|flags|defines|web|mobile|ios|android|libs|native)\b\"?(?:.*[:]\s*[{])
+    captures:
+      '1': { name: keyword.control.definition.keyword_objects.flow }
+
+  normal_objects:
+    name: meta.normal_objects.flow
+    match: \"?\b(.*)\b\"?(?:.*[:]\s*[{])
+    captures:
+      '1': { name: entity.name.function.normal_objects.flow }
+
+  normal_numeric:
+    name: meta.normal_numeric.flow
+    match: \"?\b(.*)\b\"?\s*[:]\s*(\d+)
+    captures:
+      '1': { name: entity.name.identifier.normal_numeric.flow }
+      '2': { name: constant.numeric.normal_numeric.flow }
+
+
+  keyword_roots:
+    name: meta.keyword_roots.flow
+    match: \"?\b(project|flow|app|build|files|if)\"?\b\"?(?:.*[:]\s*[{])
+    captures:
+      '1': { name: support.type.keyword_roots.flow }
+
+  keyword_arrays:
+    name: meta.keyword_arrays.flow
+    match: \"?\b(flags|defines|codepaths)\b\"?(?:.*[:]\s*[\[])
+    captures:
+      '1': { name: keyword.control.definition.keyword_arrays.flow }
+
+  keyword_string:
+    name: meta.keyword_string.flow
+    match: \"?\b(name|version|author|package|icon|main|output)\b\"?\s*[:]\s*(['].*[']|["].*["])
+    captures:
+      '1': { name: keyword.control.definition.keyword_string.flow }
+      '2': { name: string.quoted.keyword_string.flow }
+
+  # illegal:
+  #   name: invalid.illegal.unescaped.characters.flow
+  #   match: (?:([^\/"']+|\/\*(?:[^*]|\*+[^*\/])*\*+\/|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\/\/.*)
