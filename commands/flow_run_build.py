@@ -7,6 +7,105 @@ stexec = getattr( Default , "exec" )
 ExecCommand = stexec.ExecCommand
 default_AsyncProcess = stexec.AsyncProcess
 
+
+class FlowRunBuild( ExecCommand ):
+
+    def run(self, cmd = None, shell_cmd = None, file_regex = "", line_regex = "", working_dir = "",
+            encoding = "utf-8", env = {}, quiet = False, kill = False,
+            word_wrap = True, syntax = "Packages/Text/Plain text.tmLanguage",
+            # Catches "path" and "shell"
+            **kwargs):
+
+        try:
+            if self.proc and not kill:
+                self.proc.kill()
+                self.proc = None
+        except AttributeError as e:
+            pass
+
+        if kill:
+            if self.proc:
+                self.proc.kill()
+                self.finish(self.proc)
+                self.proc = None
+                sublime.status_message("Build stopped")
+
+            return
+
+        from ..flow import _flow_
+
+        if not _flow_.flow_file:
+            self.window.run_command('flow_show_status')
+            print("[flow] build : no flow file")
+            return
+
+        cmd = []
+        if _flow_.flow_type is "flow":
+            cmd = self.cmds_for_flow(_flow_);
+        elif _flow_.flow_type is "hxml":
+            cmd = self.cmds_for_haxe(_flow_);
+
+        working_dir = _flow_.get_working_dir()
+
+        print("[flow] build " + " ".join(cmd))
+
+        syntax = "Packages/sublime_flow/flow-build-output.tmLanguage"
+
+        super(FlowRunBuild, self).run(cmd, None, file_regex, line_regex, working_dir, encoding, env, True, kill, word_wrap, syntax, **kwargs)
+
+    def is_enabled(self, kill = False):
+        return True
+
+        #override the internal one to preprocess the output,
+        #what we do in this case is if absolute-path is defined
+        #for haxe output, we simply strip the project path away
+        #so that project local files are relative
+    def append_string(self, proc, val):
+
+        from ..flow import _flow_
+
+        project_path = os.path.dirname(_flow_.flow_file)
+        project_path = os.path.join(project_path,'') #ensure trailing slash
+        val = val.replace(project_path, '')
+
+        #:todo: we can process the paths with regex in the shared
+        # plugin code and be able to jump to locations I bet
+
+        super(FlowRunBuild, self).append_string(proc, val)
+
+    def cmds_for_flow(self,_flow_):
+
+        _cmd = "run"
+
+        if _flow_.build_only:
+            _cmd = "build"
+
+        if _flow_.launch_only:
+            _cmd = "launch"
+
+        cmd = [
+            "haxelib", "run", "flow",
+            _cmd, _flow_.target,
+            "--project", _flow_.flow_file
+        ]
+
+        if _flow_.build_debug:
+            cmd.append('--debug')
+
+        if _flow_.build_verbose:
+            cmd.append('--log')
+            cmd.append('3')
+
+        return cmd;
+
+    def cmds_for_haxe(self,_flow_):
+        cmd = [
+            "haxe", _flow_.flow_file
+        ]
+
+        return cmd;
+
+
 # Adapted from
 # https://github.com/SublimeText/Issues/issues/357
 
@@ -53,6 +152,7 @@ class AsyncProcess(default_AsyncProcess):
             self.proc = subprocess.Popen(shell_cmd, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE, startupinfo=startupinfo, env=proc_env, shell=True)
         elif shell_cmd and sys.platform == "darwin":
+
             # Use a login shell on OSX, otherwise the users expected env vars won't be setup
             self.proc = subprocess.Popen(["/bin/bash", "-l", "-c", shell_cmd], stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE, startupinfo=startupinfo, env=proc_env, shell=False,
@@ -65,6 +165,7 @@ class AsyncProcess(default_AsyncProcess):
                 stderr=subprocess.PIPE, startupinfo=startupinfo, env=proc_env, shell=False,
                 preexec_fn=os.setsid)
         else:
+
             preexec = None
             if sys.platform != "win32":
                 preexec = os.setsid
@@ -99,126 +200,6 @@ class AsyncProcess(default_AsyncProcess):
 
 
 stexec.AsyncProcess = AsyncProcess
-
-class FlowRunBuild( ExecCommand ):
-
-    def cmds_for_flow(self,_flow_):
-
-        _cmd = "run"
-
-        if _flow_.build_only:
-            _cmd = "build"
-
-        if _flow_.launch_only:
-            _cmd = "launch"
-
-        cmd = [
-            "haxelib", "run", "flow",
-            _cmd, _flow_.target,
-            "--project", _flow_.flow_file
-        ]
-
-        if _flow_.build_debug:
-            cmd.append('--debug')
-
-        if _flow_.build_verbose:
-            cmd.append('--log')
-            cmd.append('3')
-
-        return cmd;
-
-    def cmds_for_haxe(self,_flow_):
-        cmd = [
-            "haxe", _flow_.flow_file
-        ]
-
-        return cmd;
-
-    def run( self, cmd = [],  shell_cmd = None, file_regex = "", line_regex = "", working_dir = "",
-            encoding = None, env = {}, quiet = False, kill = False, **kwargs):
-
-        try:
-            if self.proc and not kill:
-                self.proc.kill()
-                self.proc = None
-        except AttributeError as e:
-            pass
-
-        if kill:
-            self.proc.kill()
-            self.finish(self.proc)
-            self.proc = None
-            sublime.status_message("Build stopped")
-
-            return
-
-        from ..flow import _flow_
-
-        view = self.window.active_view()
-
-        if not _flow_.flow_file:
-            self.window.run_command('flow_show_status')
-            print("[flow] build : no flow file")
-            return
-
-        cmd = []
-        if _flow_.flow_type is "flow":
-            cmd = self.cmds_for_flow(_flow_);
-        elif _flow_.flow_type is "hxml":
-            cmd = self.cmds_for_haxe(_flow_);
-
-        working_dir = _flow_.get_working_dir()
-
-        print("[flow] build " + " ".join(cmd))
-
-        if encoding is None:
-            encoding = sys.getfilesystemencoding()
-
-        self.output_view = self.window.get_output_panel("exec")
-        # self.debug_text = "\n"+" ".join(cmd)
-        self.debug_text = ""
-        self.encoding = encoding
-        self.quiet = quiet
-        self.proc = None
-
-        self.output_view.settings().set("result_file_regex", file_regex)
-        self.output_view.settings().set("result_line_regex", line_regex)
-        self.output_view.settings().set("result_base_dir", working_dir)
-        self.output_view.settings().set("scroll_past_end", False)
-        self.output_view.settings().set("word_wrap", True)
-
-        if working_dir != "":
-            if not os.path.exists(working_dir):
-                os.makedirs(working_dir)
-            os.chdir(working_dir)
-
-        if not quiet:
-            print( "Running " + " ".join(cmd) )
-
-        sublime.status_message("Running build...")
-        self.show_output_panel()
-
-        try:
-            self.proc = AsyncProcess( cmd, None, os.environ.copy(), self, **kwargs)
-            print(self.proc)
-        except OSError as e:
-            print(e)
-
-    def show_output_panel(self):
-        show_panel_on_build = sublime.load_settings("Preferences.sublime-settings").get("show_panel_on_build", True)
-        if show_panel_on_build:
-            self.window.run_command("show_panel", {"panel": "output.exec"})
-
-    def finish(self, proc):
-
-        errs = self.output_view.find_all_results()
-
-        if len(errs) != 0:
-            self.append_string(proc, ("\n[ %d build errors ]\n\n") % len(errs))
-
-        super(FlowRunBuild, self).finish(proc)
-
-        self.proc = None
 
 
 print("[flow] loaded run build")
