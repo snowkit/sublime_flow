@@ -73,6 +73,10 @@ class FlowRunBuild( ExecCommand ):
 
         super(FlowRunBuild, self).append_string(proc, val)
 
+    def finish(self, proc):
+        super(FlowRunBuild, self).finish(proc)
+        self.proc = None
+
     def cmds_for_flow(self,_flow_):
 
         _cmd = "run"
