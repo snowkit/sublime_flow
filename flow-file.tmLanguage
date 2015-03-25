@@ -137,7 +137,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\"?\b(.*)\b\"?\s*[:]\s*([0-9])</string>
+			<string>\"?\b(.*)\b\"?\s*[:]\s*(\d+)</string>
 			<key>name</key>
 			<string>meta.normal_numeric.flow</string>
 		</dict>
@@ -159,7 +159,7 @@
 		<key>numeric_values</key>
 		<dict>
 			<key>match</key>
-			<string>\"?\b([0-9])\b\"?</string>
+			<string>\"?\b(\d+)\b\"?</string>
 			<key>name</key>
 			<string>constant.numeric.flow</string>
 		</dict>
