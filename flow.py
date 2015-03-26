@@ -156,7 +156,7 @@ class FlowProject( sublime_plugin.EventListener ):
 
         if ch == "." or ch == "(":
 
-            from sublime_haxe_completion.haxe_completion import _completionist_
+            from sublime_haxe.haxe_completion import _completionist_
 
             self.completion_file = fname
             self.completion_view = view
