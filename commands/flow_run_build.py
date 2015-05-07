@@ -56,23 +56,6 @@ class FlowRunBuild( ExecCommand ):
     def is_enabled(self, kill = False):
         return True
 
-        #override the internal one to preprocess the output,
-        #what we do in this case is if absolute-path is defined
-        #for haxe output, we simply strip the project path away
-        #so that project local files are relative
-    def append_string(self, proc, val):
-
-        from ..flow import _flow_
-
-        project_path = os.path.dirname(_flow_.flow_file)
-        project_path = os.path.join(project_path,'') #ensure trailing slash
-        val = val.replace(project_path, '')
-
-        #:todo: we can process the paths with regex in the shared
-        # plugin code and be able to jump to locations I bet
-
-        super(FlowRunBuild, self).append_string(proc, val)
-
     def finish(self, proc):
         super(FlowRunBuild, self).finish(proc)
         self.proc = None

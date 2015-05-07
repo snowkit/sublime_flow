@@ -46,16 +46,7 @@ class FlowProject( sublime_plugin.EventListener ):
         self.build_only = False
         self.launch_only = False
 
-        sublime.set_timeout(lambda: self.check_for_last_used_flow_file(), 300)
-
         print("[flow] __init__")
-
-    def check_for_last_used_flow_file(self):
-
-        self.window = sublime.active_window()
-        self.project_data = self.window.project_data()
-        last_used_flow = self.project_data.get('flow_file')
-        self.set_flow_file(last_used_flow)
 
     def set_flow_file( self, file_name ):
         if not file_name:
@@ -67,8 +58,6 @@ class FlowProject( sublime_plugin.EventListener ):
         print("[flow] set flow file to " + file_name)
         sublime.status_message('set flow file to ' + file_name)
 
-        self.project_data['flow_file'] = file_name;
-        self.window.set_project_data(self.project_data)
         self.flow_file = file_name
         self.refresh_info()
 
@@ -97,6 +86,8 @@ class FlowProject( sublime_plugin.EventListener ):
 
             self.flow_type = "flow"
             self.info_json_src = run_process(cmd).decode("utf-8");
+
+            # print("[flow] json source: " + self.info_json_src);
 
             if self.info_json_src:
                 self.info_json = json.loads(self.info_json_src)
