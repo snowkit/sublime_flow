@@ -18,6 +18,7 @@ patterns:
 
 - include: '#normal_objects'
 - include: '#normal_numeric'
+- include: '#comments'
 
 repository:
 
@@ -73,6 +74,14 @@ repository:
     captures:
       '1': { name: keyword.control.definition.keyword_string.flow }
       '2': { name: string.quoted.keyword_string.flow }
+
+  comments:
+      patterns:
+
+      - name: comment.line.double-slash.flow
+        match: (//).*$\n?
+        captures:
+          '1': {name: punctuation.definition.comment.flow}
 
   # illegal:
   #   name: invalid.illegal.unescaped.characters.flow

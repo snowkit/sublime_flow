@@ -46,6 +46,10 @@
 			<key>include</key>
 			<string>#normal_numeric</string>
 		</dict>
+		<dict>
+			<key>include</key>
+			<string>#comments</string>
+		</dict>
 	</array>
 	<key>repository</key>
 	<dict>
@@ -55,6 +59,26 @@
 			<string>\"?\b(true|false)\b\"?</string>
 			<key>name</key>
 			<string>constant.numeric.flow</string>
+		</dict>
+		<key>comments</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.comment.flow</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>(//).*$\n?</string>
+					<key>name</key>
+					<string>comment.line.double-slash.flow</string>
+				</dict>
+			</array>
 		</dict>
 		<key>keyword_arrays</key>
 		<dict>
