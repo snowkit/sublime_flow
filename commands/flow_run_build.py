@@ -51,7 +51,7 @@ class FlowRunBuild( ExecCommand ):
 
         syntax = "Packages/sublime_flow/flow-build-output.tmLanguage"
 
-        super(FlowRunBuild, self).run(cmd, None, file_regex, line_regex, working_dir, encoding, env, True, kill, word_wrap, syntax, **kwargs)
+        super(FlowRunBuild, self).run(None, " ".join(cmd), file_regex, line_regex, working_dir, encoding, env, True, kill, word_wrap, syntax, **kwargs)
 
     def is_enabled(self, kill = False):
         return True

@@ -297,7 +297,28 @@ class FlowProject( sublime_plugin.EventListener ):
 
 
 def run_process( args ):
-    return subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, startupinfo=STARTUP_INFO).communicate()[0]
+    
+    shell_cmd = " ".join(args)
+    _proc = None
+
+    if sys.platform == "win32":
+        # Use shell=True on Windows, so shell_cmd is passed through with the correct escaping
+        _proc = subprocess.Popen(shell_cmd, stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT, startupinfo=STARTUP_INFO, shell=True)
+    elif sys.platform == "darwin":
+        # Use a login shell on OSX, otherwise the users expected env vars won't be setup
+        _proc = subprocess.Popen(["/bin/bash", "-l", "-c", shell_cmd], stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT, startupinfo=STARTUP_INFO, shell=False,
+            preexec_fn=os.setsid)
+    elif sys.platform == "linux":
+        # Explicitly use /bin/bash on Linux, to keep Linux and OSX as
+        # similar as possible. A login shell is explicitly not used for
+        # linux, as it's not required
+        _proc = subprocess.Popen(["/bin/bash", "-c", shell_cmd], stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT, startupinfo=STARTUP_INFO, shell=False,
+            preexec_fn=os.setsid)
+
+    return _proc.communicate()[0]
 
 def panel(_window, options, done, flags=0, sel_index=0, on_highlighted=None):
     sublime.set_timeout(lambda: _window.show_quick_panel(options, done, flags, sel_index, on_highlighted), 10)
