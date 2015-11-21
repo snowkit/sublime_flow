@@ -2,33 +2,32 @@
 import sublime, sublime_plugin
 import xml.etree.ElementTree as ET
 
-def haxe_parse_completion_list(_list):
-
-    if _list is None:
-        return []
-
-    # print(_list)
+def haxe_has_error(_list):
 
     try:
 
         root = ET.fromstring(str(_list))
+        return False
 
     except ET.ParseError as e:
-        #if there was a parse error, this is an error from haxe,
-        #so we will show it for now as a completion with blank insert
-        _error = _list.splitlines()
 
-        _error_result = []
+        return _list.splitlines()
 
-        for _line in _error:
-            if _line.find("No completion point was found") != -1:
-                return []
-            else:
-                if _line:
-                    if _line.find('haxe --') == -1:
-                        _error_result.append(( _line, ' '))
+def haxe_has_args(_list):
 
-        return _error_result
+    root = ET.fromstring(str(_list))
+    
+    if root.tag == 'type':
+        return parse_type(root.text.strip())
+
+    return None
+
+def haxe_completion_list(_list):
+
+    if _list is None:
+        return None
+    
+    root = ET.fromstring(str(_list))
 
         #list is completion of properties/methods on an object/Type
     if root.tag == 'list':
@@ -47,30 +46,19 @@ def haxe_parse_completion_list(_list):
                     _type = _name
 
             if is_function(_type):
-                members.append( ( _name+'\tfunction', _name ) )
+                _a, _ret = parse_args(_type)
+                if(_ret.find('Unknown') != -1):
+                    _ret = ' '
+                members.append( ( 'm· ' + _name+'\t'+_ret, _name ) )
             else:
-                members.append( ( _name+'\t'+_type, _name ) )
+                members.append( ( 'p· ' + _name+'\t'+_type, _name ) )
 
         if len(members):
             return members
         else:
             return [('No members/properties', '')]
 
-        #type is function arguments and the like
-    elif root.tag == 'type':
-
-        args = []
-
-        parsed = parse_type(root.text.strip())
-        if parsed is not None:
-            args = parsed
-
-        if len(args):
-            return args
-        else:
-            return None
-
-    return []
+    return None
 
 #returns args, return_type from a <type> string
 def parse_args(_type):
@@ -117,7 +105,6 @@ def parse_type(_type):
     if _type == "":
         return []
 
-    result = []
     _args = []
 
     if _type.find(':') == -1 and _type.find('->') == -1:
@@ -129,7 +116,8 @@ def parse_type(_type):
         if _args[0] in ['Void', 'Dynamic']:
             return []
 
-    _arg_str = ", ".join(_args)
+    _list = []
+
     for item in _args:
         node = item.split(':')
         _name = node[0]
@@ -138,12 +126,15 @@ def parse_type(_type):
         if len(node) > 1:
             _typename = node[1]
 
-        result.append((_name+'\t'+_typename, _name))
+        _list.append(sanitize(_name) + ':' + sanitize(_typename))
 
-    if(len(result) == 1):
-        result.append(('\t-',' '))
+    return ', '.join(_list)
 
-    return result
+def sanitize(_str):
+    _str = _str.replace('>','&gt;')
+    _str = _str.replace('<','&lt;')
+    return _str
+
 
 #returns True if the string is completion info for a function
 def is_function(_str):

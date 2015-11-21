@@ -100,7 +100,7 @@ class FlowProject( sublime_plugin.EventListener ):
 
         elif "hxml" in _ext:
             self.flow_type = "hxml"
-            print ("fetching hxml contents from " + self.flow_file)
+            print ("[flow] fetching hxml contents from " + self.flow_file)
             with open(self.flow_file, 'r') as hxml_file:
                 self.hxml_data = hxml_file.read()
 
@@ -167,10 +167,39 @@ class FlowProject( sublime_plugin.EventListener ):
 
             time_diff = time.time() - self.completion_start_time
             print("[flow] completion took {}".format(time_diff))
+            # print("[flow]\n{}".format(result))
 
-            return haxe_parse_completion_list(result)
+            _err = haxe_has_error(result)
+            if _err:
+                return self.show_errors(view, _err)
+
+            _args = haxe_has_args(result)
+            if _args:
+                return self.show_args(view, _args)
+
+            return haxe_completion_list(result)
 
         return []
+
+    def show_errors(self, view, errs):
+        
+        if not errs:
+            return None
+
+        _style = '<style></style>'
+        view.show_popup(_style + '<b>&gt; </b>' + '<br><b>&gt; </b>'.join(errs), max_width=640)
+
+    def show_args(self, view, args):
+
+        if not args:
+            return []
+
+        # print('[flow] args ' + args)
+
+        _style = '<style>font-size:0.5em;</style>'
+        view.show_popup(_style + args, max_width=640)
+
+        return None
 
     def save_file_for_completion( self, view, fname ):
 
