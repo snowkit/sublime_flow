@@ -126,7 +126,7 @@ def parse_type(_type):
         if len(node) > 1:
             _typename = node[1]
 
-        _list.append(sanitize(_name) + ':' + sanitize(_typename))
+        _list.append(sanitize(_name.strip()) + ':' + sanitize(_typename.strip()))
 
     return ', '.join(_list)
 
