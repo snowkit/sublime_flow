@@ -2,16 +2,19 @@
 import sublime, sublime_plugin
 import xml.etree.ElementTree as ET
 
-def haxe_has_error(_list):
+def haxe_has_error(_input):
 
-    try:
-
-        root = ET.fromstring(str(_list))
+    if not _input:
         return False
+        
+    if _input[0] != '<':
+        _res = []
+        for _line in _input.splitlines():
+            _res.append(sanitize(_line.strip()))
+        
+        return _res
 
-    except ET.ParseError as e:
-
-        return _list.splitlines()
+    return False
 
 def haxe_has_args(_list):
 
