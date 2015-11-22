@@ -187,15 +187,21 @@ class FlowProject( sublime_plugin.EventListener ):
         if not errs:
             return None
 
-        _pre = '<span class="invalid">&nbsp;Haxe Errors&nbsp;</span><br><br>'
-        mdpopups.show_popup(view, _pre + '\n'.join(errs), max_width=1280)
+        _pre = '<div class="invalid">&nbsp;Haxe Errors&nbsp;</div>'
+        _css = 'div { margin:0.3em; } .flow-error-line { margin-left:1em; }'
+        _res = ''
+        for _err in errs:
+            _res += '<div class="flow-error-line">'+_err+'</div>'
+
+        mdpopups.show_popup(view, _pre + _res, css=_css, max_width=1280)
 
     def show_args(self, view, args):
 
         if not args:
             return []
 
-        print('[flow] args ' + args)
+        # print('[flow] args ' + args)
+
         _res = []
         _list = args.split(', ')
         for _arg in _list:
@@ -203,7 +209,8 @@ class FlowProject( sublime_plugin.EventListener ):
             _res.append('<span class="entity name">' + _parts[0] + '</span>:<span class="storage type">' + _parts[1] + '</span>')
 
         args = '<div>'+', '.join(_res)+'</div>'
-        mdpopups.show_popup(view, args, max_width=1280)
+        _css = 'p,div { margin:0.3em; }'
+        mdpopups.show_popup(view, args, css=_css, max_width=1280)
 
         return None
 
