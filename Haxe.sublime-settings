@@ -1,5 +1,6 @@
 {
-    "auto_complete_selectors": "source - (string, comment, keyword.control.directive.conditional.haxe)",
+    "auto_complete_selector": "source - (comment, string.quoted, keyword.control.directive.conditional.haxe)",
+    "auto_complete_selectors": "source - (comment, string.quoted, keyword.control.directive.conditional.haxe)",
     "auto_complete_triggers": [
         {"selector": "source.haxe", "characters": "."}
     ]

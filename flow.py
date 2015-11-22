@@ -115,72 +115,89 @@ class FlowProject( sublime_plugin.EventListener ):
 
         _res = self.completion(view, view.file_name())
 
-        if _res is None:
             #explicitly no completion
+        if _res is None:
+            # print('[flow] completion res was none')
             return ([], sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
         else:
             if(len(_res)):
                 return (_res, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+            # else:
+                # print('[flow] completion _res `{}`'.format(_res))
 
     def completion(self, view, fname):
 
         if self.flow_file == "" or self.flow_file is None:
             sublime.status_message("No flow file, right click in a flow file! {}".format(str(self.flow_file)))
+            # print('[flow] completion return [], no flow file')
             return []
 
         if not self.hxml_data:
             sublime.status_message("no info/hxml for flow file, caching...")
             self.refresh_info()
 
-        sel = view.sel()[0]
-        word = view.word(sel)
+        #ignore strings, comments, #if conditionals, for some reason the triggers won't work
+        ifsel = view.sel()[0]
+        ifsel.a -= 2; ifsel.b -= 2
+        scsel = view.sel()[0]
+        ifdef_score = view.score_selector(ifsel.begin(), "source - (keyword.control.directive.conditional.haxe)") 
+        scope_score = view.score_selector(scsel.begin(), "source - (comment, string.quoted, keyword.control.directive.conditional.haxe)") 
+        # print('[flow] ifdef score `{}`'.format(str(ifdef_score)))
+        # print('[flow] scope score `{}`'.format(str(scope_score)))
 
-        if len(word) == 0:
-            return []
+        if scope_score <= 0 or ifdef_score <= 0:
+            # print('[flow] ignore invalid scope for completion')
+            return None
 
-        ch = view.substr(word)[0]
+        sel = view.sel()[0]; sel.a -= 1
+        ch = view.substr(sel)
+        # print('[flow] completion ch `{}`'.format(ch))
+
+        if ch != "." and ch != "(":
+            # print('[flow] ignore completion by non . or (')
+            return None
+
         code = view.substr(sublime.Region(0, view.size()))
-        prior = code[0:sel.begin()].encode('utf-8')
+        prior = code[0:view.sel()[0].begin()].encode('utf-8')
         offset = len(prior)
 
         cwd = self.get_working_dir()
         filename = fname
 
-        if ch == "." or ch == "(":
+        from sublime_haxe.haxe_completion import _completionist_
 
-            from sublime_haxe.haxe_completion import _completionist_
+        self.completion_file = fname
+        self.completion_view = view
+        self.completion_data = None
 
-            self.completion_file = fname
-            self.completion_view = view
-            self.completion_data = None
+        _hxml = self.hxml_data.splitlines()
 
-            _hxml = self.hxml_data.splitlines()
+        self.completion_pending = True
 
-            self.completion_pending = True
+        self.completion_start_time = time.time()
 
-            self.completion_start_time = time.time()
+        self.save_file_for_completion(view, fname)
 
-            self.save_file_for_completion(view, fname)
+        result = _completionist_.complete(cwd, filename, offset, _hxml)
 
-            result = _completionist_.complete(cwd, filename, offset, _hxml)
+        self.restore_file_post_completion()
 
-            self.restore_file_post_completion()
+        time_diff = time.time() - self.completion_start_time
+        print("[flow] completion took {}".format(time_diff))
+        # print("[flow]\n{}".format(result))
 
-            time_diff = time.time() - self.completion_start_time
-            print("[flow] completion took {}".format(time_diff))
-            # print("[flow]\n{}".format(result))
+        if not result:
+            return None
 
-            _err = haxe_has_error(result)
-            if _err:
-                return self.show_errors(view, _err)
+        _err = haxe_has_error(result)
+        if _err:
+            return self.show_errors(view, _err)
 
-            _args = haxe_has_args(result)
-            if _args:
-                return self.show_args(view, _args)
+        _args = haxe_has_args(result)
+        if _args:
+            return self.show_args(view, _args)
 
-            return haxe_completion_list(result)
-
-        return []
+        return haxe_completion_list(result)
 
     def show_errors(self, view, errs):
         
