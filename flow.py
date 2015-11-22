@@ -4,6 +4,7 @@ import sys, os, subprocess, shutil, json, codecs, time
 
 import sublime, sublime_plugin
 from .haxe_parse_completion_list import *
+import mdpopups
 
 #plugin location
 plugin_file = __file__
@@ -186,8 +187,13 @@ class FlowProject( sublime_plugin.EventListener ):
         if not errs:
             return None
 
-        _style = '<style></style>'
-        view.show_popup(_style + '<b>&gt; </b>' + '<br><b>&gt; </b>'.join(errs), max_width=640)
+        _pre = '<div class="invalid">&nbsp;Haxe Errors&nbsp;</div>'
+        _css = 'div { margin:0.3em; } .flow-error-line { margin-left:1em; }'
+        _res = ''
+        for _err in errs:
+            _res += '<div class="flow-error-line">'+_err+'</div>'
+
+        mdpopups.show_popup(view, _pre + _res, css=_css, max_width=1280)
 
     def show_args(self, view, args):
 
@@ -196,8 +202,15 @@ class FlowProject( sublime_plugin.EventListener ):
 
         # print('[flow] args ' + args)
 
-        _style = '<style>font-size:0.5em;</style>'
-        view.show_popup(_style + args, max_width=640)
+        _res = []
+        _list = args.split(', ')
+        for _arg in _list:
+            _parts = _arg.split(':')
+            _res.append('<span class="entity name">' + _parts[0] + '</span>:<span class="storage type">' + _parts[1] + '</span>')
+
+        args = '<div>'+', '.join(_res)+'</div>'
+        _css = 'p,div { margin:0.3em; }'
+        mdpopups.show_popup(view, args, css=_css, max_width=1280)
 
         return None
 
