@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, subprocess, shutil, json, codecs, time
+import sys, os, subprocess, shutil, shlex, json, codecs, time
 
 import sublime, sublime_plugin
 from .haxe_parse_completion_list import *
@@ -188,7 +188,7 @@ class FlowProject( sublime_plugin.EventListener ):
             return None
 
         _pre = '<div class="invalid">&nbsp;Haxe Errors&nbsp;</div>'
-        _css = 'div { margin:0.3em; } .flow-error-line { margin-left:1em; }'
+        _css = 'div { margin:0.3em; } .flow-error-line { margin-left:1em; margin-right:2em; }'
         _res = ''
         for _err in errs:
             _res += '<div class="flow-error-line">'+_err+'</div>'
@@ -340,8 +340,11 @@ class FlowProject( sublime_plugin.EventListener ):
 
 def run_process( args ):
     
-    shell_cmd = " ".join(args)
     _proc = None
+    shell_cmd = ""
+    for arg in args:
+        #make sure lines from the hxml file don't trip up the shell
+        shell_cmd += shlex.quote(arg) + " "
 
     if sys.platform == "win32":
         # Use shell=True on Windows, so shell_cmd is passed through with the correct escaping
