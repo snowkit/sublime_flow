@@ -160,7 +160,7 @@ class FlowProject( sublime_plugin.EventListener ):
 
         if ch != "." and ch != "(":
             # print('[flow] ignore completion by non . or (')
-            return None
+            return []
 
         code = view.substr(sublime.Region(0, view.size()))
         prior = code[0:view.sel()[0].begin()].encode('utf-8')
