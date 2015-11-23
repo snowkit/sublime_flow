@@ -363,15 +363,16 @@ class FlowProject( sublime_plugin.EventListener ):
 def run_process( args ):
     
     _proc = None
+    
+    #this shell_cmd is not used by windows
     shell_cmd = ""
     for arg in args:
-        #make sure lines from the hxml file don't trip up the shell
+        #make sure lines from the hxml file don't trip up the mac/linux shell
         shell_cmd += shlex.quote(arg) + " "
 
     if sys.platform == "win32":
-        # Use shell=True on Windows, so shell_cmd is passed through with the correct escaping
-        _proc = subprocess.Popen(shell_cmd, stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT, startupinfo=STARTUP_INFO, shell=True)
+        _proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, startupinfo=STARTUP_INFO)
+
     elif sys.platform == "darwin":
         # Use a login shell on OSX, otherwise the users expected env vars won't be setup
         _proc = subprocess.Popen(["/bin/bash", "-l", "-c", shell_cmd], stdout=subprocess.PIPE,
