@@ -96,6 +96,11 @@ class FlowProject( sublime_plugin.EventListener ):
                     print("[flow] refresh info/hxml failed! info_json was null")
                 else:
                     self.hxml_data = self.info_json['hxml']
+                    # print("[flow] hxml source: " + self.hxml_data);
+                    self.hxml_data = self.hxml_data.replace('\\"','"'); 
+                    self.hxml_data = self.hxml_data.replace('\\n','\n'); 
+                    self.hxml_data = self.hxml_data.replace('\\t','\t'); 
+                    # print("[flow] hxml cleaned: " + self.hxml_data);
             else:
                 print("[flow] refresh info/hxml failed! info_json_src was not returned from haxelib run flow, is your flow up to date?")
 
