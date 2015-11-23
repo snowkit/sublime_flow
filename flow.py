@@ -88,7 +88,7 @@ class FlowProject( sublime_plugin.EventListener ):
             self.flow_type = "flow"
             self.info_json_src = run_process(cmd).decode("utf-8");
 
-            print("[flow] json source: >>\n{}\n<<".format(self.info_json_src));
+            # print("[flow] json source: >>\n{}\n<<".format(self.info_json_src));
 
             if self.info_json_src:
                 self.info_json = json.loads(self.info_json_src)
