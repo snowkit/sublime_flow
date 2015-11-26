@@ -62,13 +62,7 @@ class FlowRunBuild( ExecCommand ):
 
     def cmds_for_flow(self,_flow_):
 
-        _cmd = "run"
-
-        if _flow_.build_only:
-            _cmd = "build"
-
-        if _flow_.launch_only:
-            _cmd = "launch"
+        _cmd = _flow_.build_type
 
         cmd = [
             "haxelib", "run", "flow",

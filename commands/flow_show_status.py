@@ -3,11 +3,11 @@ import sublime, sublime_plugin
 
 class FlowShowStatus( sublime_plugin.WindowCommand ):
 
-    def run(self):
+    def run(self, sel_index=0):
         from ..flow import _flow_, panel
 
         view = self.window.active_view()
-        panel(self.window, _flow_.get_status(), self.on_select)
+        panel(self.window, _flow_.get_status(), self.on_select, sel_index=sel_index)
 
     def on_select(self, index):
         from ..flow import _flow_
@@ -28,6 +28,8 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
             else:
                 _flow_.build_debug = True
 
+            self.run(sel_index=2)
+
                 #need to refresh hxml, as it may differ
                 #for debug builds, including the debug conditional
             _flow_.refresh_info();
@@ -43,35 +45,22 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
 
             print("[flow] toggle build verbose, now at " + str(_flow_.build_verbose))
 
-            #build only flag
+            self.run(sel_index=3)
+
+            #build type flag
         if index == 4:
-            if _flow_.build_only:
-                _flow_.build_only = False
-            else:
-                _flow_.build_only = True
+            if _flow_.build_type == 'run':
+                _flow_.build_type = 'build'
+            elif _flow_.build_type == 'build':
+                _flow_.build_type = 'compile'
+            elif _flow_.build_type == 'compile':
+                _flow_.build_type = 'launch'
+            elif _flow_.build_type == 'launch':
+                _flow_.build_type = 'run'
 
-            print("[flow] toggle build only, now at " + str(_flow_.build_only))
+            print("[flow] switched build type: run/build/compile/launch, now at " + str(_flow_.build_type))
 
-            #launch only flag
-        if index == 5:
-            if _flow_.launch_only:
-                _flow_.launch_only = False
-            else:
-                _flow_.launch_only = True
-
-            print("[flow] toggle launch only, now at " + str(_flow_.launch_only))
-
-            #package
-        if index == 6:
-            pass
-
-            #clean output
-        if index == 7:
-            pass
-
-            #clean build
-        if index == 8:
-            pass
+            self.run(sel_index=4)
 
 
     def is_visible(self):
