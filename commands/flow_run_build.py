@@ -20,7 +20,7 @@ class FlowRunBuild( ExecCommand ):
             if self.proc and not kill:
                 self.proc.kill()
                 self.proc = None
-        except AttributeError as e:
+        except Exception as e:
             pass
 
         if kill:
