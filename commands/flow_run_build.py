@@ -17,19 +17,14 @@ class FlowRunBuild( ExecCommand ):
             **kwargs):
 
         try:
-            if self.proc and not kill:
-                self.proc.kill()
-                self.proc = None
+            if self.proc:
+                super(FlowRunBuild, self).run(None, kill=True)
         except Exception as e:
-            pass
+            print("[flow] couldn't kill previous executable: probably it ended > " + str(e))
+
+        self.proc = None
 
         if kill:
-            if self.proc:
-                self.proc.kill()
-                self.finish(self.proc)
-                self.proc = None
-                sublime.status_message("Build stopped")
-
             return
 
         from ..flow import _flow_
