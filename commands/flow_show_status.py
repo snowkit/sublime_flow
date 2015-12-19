@@ -28,8 +28,6 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
             else:
                 _flow_.build_debug = True
 
-            self.run(sel_index=2)
-
                 #need to refresh hxml, as it may differ
                 #for debug builds, including the debug conditional
             _flow_.refresh_info();
