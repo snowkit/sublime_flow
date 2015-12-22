@@ -54,6 +54,8 @@ class FlowShowStatus( sublime_plugin.WindowCommand ):
             elif _flow_.build_type == 'compile':
                 _flow_.build_type = 'launch'
             elif _flow_.build_type == 'launch':
+                _flow_.build_type = 'launch --with-files'
+            elif _flow_.build_type == 'launch --with-files':
                 _flow_.build_type = 'run'
 
             print("[flow] switched build type: run/build/compile/launch, now at " + str(_flow_.build_type))

@@ -58,15 +58,21 @@ class FlowRunBuild( ExecCommand ):
     def cmds_for_flow(self,_flow_):
 
         _cmd = _flow_.build_type
+        _cmd_used = _cmd
+        if(_cmd == 'launch --with-files'):
+            _cmd_used = 'launch'
 
         cmd = [
             "haxelib", "run", "flow",
-            _cmd, _flow_.target,
+            _cmd_used, _flow_.target,
             "--project", _flow_.flow_file
         ]
 
         if _flow_.build_debug:
             cmd.append('--debug')
+
+        if(_cmd == 'launch --with-files'):
+            cmd.append('--with-files')
 
         if _flow_.build_verbose:
             cmd.append('--log')
