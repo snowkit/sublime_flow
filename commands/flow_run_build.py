@@ -18,7 +18,7 @@ class FlowRunBuild( ExecCommand ):
 
         try:
             if self.proc:
-                super(FlowRunBuild, self).run(None, kill=True)
+                super(FlowRunBuild, self).run(kill=True)
         except Exception as e:
             print("[flow] couldn't kill previous executable: probably it ended > " + str(e))
 
@@ -42,11 +42,38 @@ class FlowRunBuild( ExecCommand ):
 
         working_dir = _flow_.get_working_dir()
 
-        print("[flow] build " + " ".join(cmd))
+        print("[flow] build: " + " ".join(cmd))
 
         syntax = "Packages/sublime_flow/flow-build-output.tmLanguage"
 
-        super(FlowRunBuild, self).run(None, " ".join(cmd), file_regex, line_regex, working_dir, encoding, env, True, kill, word_wrap, syntax, **kwargs)
+        super(FlowRunBuild, self).run( 
+                cmd= None, 
+                shell_cmd= " ".join(cmd),
+                file_regex= file_regex, 
+                line_regex= line_regex, 
+                working_dir= working_dir, 
+                encoding= encoding, 
+                env= env, 
+                quiet= False, 
+                kill= kill, 
+                word_wrap= word_wrap, 
+                syntax= syntax, 
+                **kwargs)
+
+        #if sublime handled kill properly we could just use this :/
+        # self.window.run_command('exec', {
+        #     'shell_cmd': " ".join(cmd),
+        #     'file_regex': file_regex,
+        #     'line_regex': line_regex,
+        #     'working_dir': working_dir,
+        #     'encoding': encoding,
+        #     'env': env,
+        #     'quiet': True,
+        #     'kill': kill,
+        #     'word_wrap': word_wrap,
+        #     'syntax': syntax
+        # })
+
 
     def is_enabled(self, kill = False):
         return True
